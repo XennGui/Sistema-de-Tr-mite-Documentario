@@ -13,3 +13,4 @@ passlib[bcrypt]
 python-jose
 pydantic
 dateparser
+email-validator
