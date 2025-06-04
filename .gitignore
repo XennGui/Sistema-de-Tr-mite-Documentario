@@ -1,4 +1,8 @@
 #BACKEND
+__pycache__
+env
+vectorstore
+.env
 
 # FRONTEND
 FRONTEND/node_modules
