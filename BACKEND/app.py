@@ -4,6 +4,7 @@ from rutas.area import router as area_router
 from rutas.usuario import router as usuario_router
 from rutas.tramite_externo import router as tramite_externo_router
 from rutas.tramite_interno import router as tramite_interno_router
+from rutas.seguimiento_tramite import router as seguimiento_tramite_router
 from pydantic import BaseModel
 from typing import Optional, List, Tuple
 from embeddings import create_embeddings, save_vectorstore, load_vectorstore, prepare_docs_from_db
@@ -30,6 +31,7 @@ app.include_router(area_router)
 app.include_router(usuario_router)
 app.include_router(tramite_externo_router)
 app.include_router(tramite_interno_router)
+app.include_router(seguimiento_tramite_router)
 
 # Carga y configuración del modelo
 vectorstore = load_vectorstore()
