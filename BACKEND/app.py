@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from rutas.area import router as area_router
 from rutas.usuario import router as usuario_router
+from rutas.tramite_externo import router as tramite_externo_router
 from pydantic import BaseModel
 from typing import Optional, List, Tuple
 from embeddings import create_embeddings, save_vectorstore, load_vectorstore, prepare_docs_from_db
@@ -26,6 +27,7 @@ app.add_middleware(
 
 app.include_router(area_router)
 app.include_router(usuario_router)
+app.include_router(tramite_externo_router)
 
 # Carga y configuración del modelo
 vectorstore = load_vectorstore()
