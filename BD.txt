@@ -1,0 +1,107 @@
+--Creamos contenedor con Docker y BD con Postgres
+docker run --name Municipio -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=admin -p 5436:5432 -d postgres
+
+--Con azure o con pgadmin
+
+CREATE DATABASE municipio;
+
+-- Tabla de áreas 
+CREATE TABLE areas (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT
+);
+
+-- Tabla de usuarios con rol por defecto 'admin'
+CREATE TABLE usuarios (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    area_id INTEGER REFERENCES areas(id),
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    rol VARCHAR(20) NOT NULL CHECK (rol IN ('admin', 'mesa_partes')) DEFAULT 'admin',
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabla de trámites externos (optimizada)
+CREATE TABLE tramites_externos (
+    id SERIAL PRIMARY KEY,
+    numero_expediente VARCHAR(50) UNIQUE NOT NULL,
+    codigo_seguridad VARCHAR(20) UNIQUE NOT NULL,
+    remitente VARCHAR(200) NOT NULL,
+    tipo_documento VARCHAR(50) NOT NULL,
+    folios INTEGER NOT NULL,
+    asunto TEXT NOT NULL,
+    contenido TEXT, -- Texto extraído para búsquedas
+    archivo VARCHAR(255),
+    tipo_persona VARCHAR(10) CHECK (tipo_persona IN ('natural', 'juridica')),
+    dni_ruc VARCHAR(20) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    telefono VARCHAR(20),
+    estado VARCHAR(20) DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'atendido', 'denegado', 'derivado', 'archivado')),
+    prioridad INTEGER DEFAULT 3 CHECK (prioridad BETWEEN 1 AND 5),
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_vencimiento TIMESTAMP,
+    usuario_registro_id INTEGER REFERENCES usuarios(id),
+    area_actual_id INTEGER REFERENCES areas(id)
+);
+
+-- Tabla de trámites internos (estructura consistente con externos)
+CREATE TABLE tramites_internos (
+    id SERIAL PRIMARY KEY,
+    numero_referencia VARCHAR(50) UNIQUE NOT NULL, -- Similar a expediente
+    asunto TEXT NOT NULL,
+    contenido TEXT NOT NULL,
+    folios INTEGER NOT NULL DEFAULT 1,
+    archivo VARCHAR(255),
+    remitente_id INTEGER REFERENCES usuarios(id) NOT NULL,
+    area_origen_id INTEGER REFERENCES areas(id) NOT NULL,
+    area_destino_id INTEGER REFERENCES areas(id) NOT NULL,
+    estado VARCHAR(20) DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'recibido', 'atendido', 'derivado', 'archivado')),
+    prioridad INTEGER DEFAULT 3 CHECK (prioridad BETWEEN 1 AND 5),
+    fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_recepcion TIMESTAMP,
+    fecha_vencimiento TIMESTAMP
+);
+
+-- Tabla unificada de seguimiento
+CREATE TABLE seguimiento_tramites (
+    id SERIAL PRIMARY KEY,
+    tramite_id INTEGER NOT NULL,
+    tramite_type VARCHAR(10) NOT NULL CHECK (tramite_type IN ('externo', 'interno')),
+    accion VARCHAR(50) NOT NULL,
+    descripcion TEXT NOT NULL,
+    usuario_id INTEGER REFERENCES usuarios(id) NOT NULL,
+    area_id INTEGER REFERENCES areas(id),
+    adjunto VARCHAR(255),
+    observaciones TEXT,
+    fecha_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabla de derivaciones (simplificada, usa seguimiento para registro)
+CREATE TABLE derivaciones (
+    id SERIAL PRIMARY KEY,
+    tramite_id INTEGER NOT NULL,
+    tramite_type VARCHAR(10) NOT NULL CHECK (tramite_type IN ('externo', 'interno')),
+    area_origen_id INTEGER REFERENCES areas(id) NOT NULL,
+    area_destino_id INTEGER REFERENCES areas(id) NOT NULL,
+    usuario_derivacion_id INTEGER REFERENCES usuarios(id) NOT NULL,
+    fecha_derivacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    instrucciones TEXT,
+    fecha_limite TIMESTAMP
+);
+
+-- Tabla para documentos generados (unificada para ambos tipos)
+CREATE TABLE documentos_generados (
+    id SERIAL PRIMARY KEY,
+    tramite_id INTEGER NOT NULL,
+    tramite_type VARCHAR(10) NOT NULL CHECK (tramite_type IN ('externo', 'interno')),
+    tipo_documento VARCHAR(250) NOT NULL,
+    contenido TEXT NOT NULL,
+    archivo VARCHAR(255) NOT NULL,
+    usuario_generador_id INTEGER REFERENCES usuarios(id) NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    firmado BOOLEAN DEFAULT FALSE,
+    fecha_firma TIMESTAMP
+);
