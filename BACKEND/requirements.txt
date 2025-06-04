@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+psycopg2-binary
+langchain
+langchain-ollama
+langchain-community
+faiss-cpu
+transformers
+sentence-transformers
+requests
+python-dotenv
+passlib[bcrypt]
+python-jose
+pydantic
+dateparser
