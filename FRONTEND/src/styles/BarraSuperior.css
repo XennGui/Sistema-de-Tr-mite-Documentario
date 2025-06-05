@@ -1,0 +1,38 @@
+/* src/styles/BarraSuperior.css */
+.barra-superior {
+    background: #0a457c;
+    padding: 1rem 0;
+    box-shadow: 0 2px 8px #e0e5ef;
+}
+
+.contenido-barra {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.titulo-barra {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.7rem;
+    letter-spacing: 1.5px;
+}
+
+.boton-login-barra {
+    background-color: #fff;
+    color: #0a457c;
+    border: 1.5px solid #0a457c;
+    border-radius: 6px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.boton-login-barra:hover {
+    background: #d7e6fa;
+    color: #08325b;
+}

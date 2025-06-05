@@ -1,0 +1,33 @@
+/* src/styles/Home.css */
+.home-main {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.home-center-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    margin-top: 7rem;
+}
+
+.home-main-btn {
+    background: #0a457c;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 1.2rem 2.7rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px #e0e5ef;
+    transition: background 0.18s, color 0.18s;
+}
+
+.home-main-btn:hover {
+    background: #08325b;
+    color: #d7e6fa;
+}

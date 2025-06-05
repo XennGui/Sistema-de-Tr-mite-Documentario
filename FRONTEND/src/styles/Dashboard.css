@@ -1,0 +1,21 @@
+/* src/styles/Dashboard.css */
+.dashboard-contenedor {
+    min-height: 100vh;
+    background: #f5f6fa;
+    padding-top: -1rem;
+}
+
+.dashboard-main {
+    display: flex;
+    flex-direction: row;
+    min-height: calc(100vh - 70px);
+}
+
+.dashboard-contenido {
+    flex: 1;
+    padding: 2.5rem 2.5rem 2rem 2.5rem;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px 0 #e0e7ef;
+    margin: 2.5rem 2.5rem 2rem 2.5rem;
+}

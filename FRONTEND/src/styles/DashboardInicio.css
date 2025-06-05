@@ -1,0 +1,133 @@
+/* src/styles/DashboardInicio.css */
+
+.dashboard-inicio {
+    width: 100%;
+    padding: 0 1rem 1rem 1rem;
+}
+
+.dashboard-cajas-row {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2.6rem;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.dashboard-caja {
+    display: flex;
+    align-items: center;
+    background: #f5f6fa;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px 0 #e0e7ef;
+    padding: 1.1rem 2rem;
+    min-width: 180px;
+    max-width: 220px;
+    flex: 1 0 0;
+    gap: 1.1rem;
+    transition: transform 0.13s;
+}
+
+.dashboard-caja:hover {
+    transform: translateY(-5px) scale(1.03);
+}
+
+.dashboard-caja-icon {
+    font-size: 2rem;
+    color: #0a457c;
+    margin-right: 6px;
+}
+
+.info-areas .dashboard-caja-icon {
+    color: #4caf50;
+}
+
+.info-usuarios .dashboard-caja-icon {
+    color: #2196f3;
+}
+
+.info-ext .dashboard-caja-icon {
+    color: #ff9800;
+}
+
+.info-int .dashboard-caja-icon {
+    color: #4bc0c0;
+}
+
+.dashboard-caja-titulo {
+    font-size: 1.05rem;
+    color: #888;
+    margin-bottom: 0.08rem;
+}
+
+.dashboard-caja-num {
+    font-size: 1.3rem;
+    color: #0a457c;
+    font-weight: bold;
+}
+
+/* Gráficos: ocupa todo el ancho y centrados */
+.dashboard-graficos-superrow {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4rem;
+    margin-top: 1.5rem;
+}
+
+.dashboard-grafico-card2 {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px 0 #e0e7ef;
+    padding: 1.3rem 1.5rem 1.1rem 1.5rem;
+    flex: 1 1 0;
+    min-width: 400px;
+    max-width: 650px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.dashboard-grafico-titulo {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #0a457c;
+    margin-bottom: 1rem;
+}
+
+.grafico-pie-wrapper2 {
+    width: 260px;
+    height: 260px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboard-grafico-leyenda {
+    display: flex;
+    flex-direction: row;
+    gap: 1.1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.99rem;
+    justify-content: center;
+}
+
+.leyenda-color {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+    border: 2px solid #eee;
+}
+
+.dashboard-error {
+    color: #c00;
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+}

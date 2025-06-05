@@ -1,0 +1,43 @@
+/* src/styles/MenuLateral.css */
+.menu-lateral {
+    background: #e6effa;
+    min-width: 230px;
+    padding-top: 2rem;
+    border-top-right-radius: 17px;
+    border-bottom-right-radius: 17px;
+    box-shadow: 2px 0 8px #e0e7ef;
+    min-height: calc(100vh - 70px);
+}
+
+.menu-lateral ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-lateral li {
+    display: flex;
+    align-items: center;
+    gap: 1.3rem;
+    padding: 1.15rem 2rem;
+    font-size: 1.13rem;
+    color: #0a457c;
+    cursor: pointer;
+    border-left: 4px solid transparent;
+    transition: background 0.16s, border 0.16s, color 0.16s;
+}
+
+.menu-lateral li:hover,
+.menu-lateral li.activo {
+    background: #c3defb;
+    border-left: 4px solid #0a457c;
+    color: #08325b;
+    font-weight: 600;
+}
+
+.icono-menu {
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    margin-right: 2px;
+}
