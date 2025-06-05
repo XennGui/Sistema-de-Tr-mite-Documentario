@@ -5,6 +5,12 @@ import { FaUserCircle, FaBuilding, FaChevronDown, FaSignOutAlt } from "react-ico
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+const ROLES_OPTIONS = [
+  { value: "admin", label: "Administrador" },
+  { value: "mesa_partes", label: "Mesa de partes" },
+  { value: "usuario", label: "Jefe" },
+  { value: "auxiliar", label: "Auxiliar" },
+];
 
 export default function BarraCabecera() {
     const [usuario, setUsuario] = useState(() =>
@@ -15,7 +21,6 @@ export default function BarraCabecera() {
     const menuRef = useRef();
     const navigate = useNavigate();
 
-    // Actualiza el usuario cada vez que se abre el menú (por si cambió el nombre)
     useEffect(() => {
         if (menuAbierto) {
             const usuarioActualizado = JSON.parse(localStorage.getItem("usuario") || "{}");
@@ -23,7 +28,6 @@ export default function BarraCabecera() {
         }
     }, [menuAbierto]);
 
-    // Escucha cambios en localStorage desde otras pestañas/ventanas
     useEffect(() => {
         function handleStorageChange(e) {
             if (e.key === "usuario") {
@@ -35,7 +39,6 @@ export default function BarraCabecera() {
         return () => window.removeEventListener("storage", handleStorageChange);
     }, []);
 
-    // Cierra el menú si se hace clic fuera de él
     useEffect(() => {
         function handleClickOutside(e) {
             if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -51,6 +54,11 @@ export default function BarraCabecera() {
         setMenuAbierto(false);
         navigate("/login", { replace: true });
     };
+
+    // Busca el label del rol:
+    const rolLegible = usuario.rol
+        ? (ROLES_OPTIONS.find(r => r.value === usuario.rol)?.label || usuario.rol)
+        : "";
 
     return (
         <header className="cabecera-principal">
@@ -68,7 +76,7 @@ export default function BarraCabecera() {
                     <div className="cabecera-nombre-rol">
                         <div>{usuario.nombre || "Usuario"}</div>
                         <div className="cabecera-rol">
-                            {usuario.rol ? usuario.rol.replace("_", " ") : ""}
+                            {rolLegible}
                         </div>
                     </div>
                     <FaChevronDown style={{ marginLeft: 8 }} />
