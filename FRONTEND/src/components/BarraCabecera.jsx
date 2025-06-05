@@ -6,10 +6,10 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ROLES_OPTIONS = [
-  { value: "admin", label: "Administrador" },
-  { value: "mesa_partes", label: "Mesa de partes" },
-  { value: "usuario", label: "Jefe" },
-  { value: "auxiliar", label: "Auxiliar" },
+    { value: "admin", label: "Administrador" },
+    { value: "mesa_partes", label: "Mesa de partes" },
+    { value: "usuario", label: "Jefe" },
+    { value: "auxiliar", label: "Auxiliar" },
 ];
 
 export default function BarraCabecera() {
@@ -55,7 +55,7 @@ export default function BarraCabecera() {
         navigate("/login", { replace: true });
     };
 
-    // Busca el label del rol:
+    //Busca el label del rol:
     const rolLegible = usuario.rol
         ? (ROLES_OPTIONS.find(r => r.value === usuario.rol)?.label || usuario.rol)
         : "";

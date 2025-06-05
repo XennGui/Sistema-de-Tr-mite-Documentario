@@ -1,4 +1,5 @@
 // src/components/MenuLateral.jsx
+
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/MenuLateral.css";
 import {
@@ -13,7 +14,7 @@ export default function MenuLateral({ rol }) {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Opciones para admin y mesa de partes
+    //Opciones para admin y mesa de partes
     const opcionesFull = [
         { label: "Inicio", ruta: "/dashboard", icon: <FaHome /> },
         { label: "Áreas", ruta: "/dashboard/areas", icon: <FaBuilding /> },
@@ -21,7 +22,7 @@ export default function MenuLateral({ rol }) {
         { label: "Trámites Externos", ruta: "/dashboard/tramites-externos", icon: <FaFolderOpen /> },
         { label: "Trámites Internos", ruta: "/dashboard/tramites-internos", icon: <FaExchangeAlt /> },
     ];
-    // Opciones para otros roles
+    //Opciones para otros roles
     const opcionesLimitadas = [
         { label: "Inicio", ruta: "/dashboard", icon: <FaHome /> },
         { label: "Trámites Externos", ruta: "/dashboard/tramites-externos", icon: <FaFolderOpen /> },
