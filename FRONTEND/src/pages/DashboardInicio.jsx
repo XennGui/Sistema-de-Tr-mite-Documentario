@@ -1,4 +1,5 @@
 // src/pages/DashboardInicio.jsx
+
 import { useEffect, useState } from "react";
 import { FaBuilding, FaUsers, FaFolderOpen, FaExchangeAlt } from "react-icons/fa";
 import { Pie } from "react-chartjs-2";

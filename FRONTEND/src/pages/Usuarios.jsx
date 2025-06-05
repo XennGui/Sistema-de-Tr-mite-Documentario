@@ -1,4 +1,5 @@
 // src/pages/Usuarios.jsx
+
 import { useEffect, useState } from "react";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import {
@@ -135,7 +136,6 @@ export default function Usuarios() {
                     ...usuarioActualizado
                 }));
             }
-            // --- FIN DE SOLUCIÓN ---
 
             cerrarModal();
             cargarUsuarios();

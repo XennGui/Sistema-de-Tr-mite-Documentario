@@ -1,4 +1,5 @@
 // src/pages/Dashboard.jsx
+
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation, Routes, Route } from "react-router-dom";
 import BarraCabecera from "../components/BarraCabecera";

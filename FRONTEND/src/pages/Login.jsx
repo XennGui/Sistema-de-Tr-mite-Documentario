@@ -1,4 +1,5 @@
 // src/pages/Login.jsx
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BarraSuperior from "../components/BarraSuperior";
@@ -14,7 +15,7 @@ export default function Login() {
     const [cargando, setCargando] = useState(false);
     const navigate = useNavigate();
 
-    // Si ya está logueado, redirige al dashboard (evita acceso al login)
+    //si ya está logueado, redirige al dashboard
     useEffect(() => {
         if (localStorage.getItem("usuario")) {
             navigate("/dashboard", { replace: true });

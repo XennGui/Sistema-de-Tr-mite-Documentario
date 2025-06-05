@@ -1,4 +1,5 @@
 // src/pages/Home.jsx
+
 import { useNavigate } from "react-router-dom";
 import BarraSuperior from "../components/BarraSuperior";
 import "../styles/Home.css";
