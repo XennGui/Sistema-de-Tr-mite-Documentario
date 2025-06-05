@@ -19,7 +19,7 @@ export async function obtenerEstadisticasDashboard(usuario) {
         intRes.json()
     ]);
 
-    // Filtrar por área si no es admin/mesa_partes
+    //Filtrar por área si no es admin/mesa_partes
     const tramitesExt = ext.tramites || [];
     const tramitesInt = int.tramites || [];
     const tramitesExtFiltrados = esAdmin ? tramitesExt : tramitesExt.filter(t => t.area_actual_id === areaId);

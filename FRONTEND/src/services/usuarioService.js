@@ -3,7 +3,7 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 /**
- * Inicia sesión con username/email y password.
+ * se inicia sesión con username/email y password.
  */
 export async function loginUsuario(identificador, password) {
     try {
@@ -22,9 +22,6 @@ export async function loginUsuario(identificador, password) {
     }
 }
 
-/**
- * Obtiene la lista de usuarios.
- */
 export async function obtenerUsuarios() {
     const res = await fetch(`${API_URL}/usuarios`);
     if (!res.ok) throw new Error("Error al obtener usuarios");
@@ -32,7 +29,6 @@ export async function obtenerUsuarios() {
 }
 
 /**
- * Crea un usuario nuevo.
  * @param {*} usuario {nombre, area_id, username, password, email, rol}
  */
 export async function crearUsuario(usuario) {
@@ -46,7 +42,6 @@ export async function crearUsuario(usuario) {
 }
 
 /**
- * Actualiza un usuario existente.
  * @param {*} id ID del usuario
  * @param {*} usuario {nombre, area_id, username, password, email, rol}
  */
@@ -60,9 +55,6 @@ export async function actualizarUsuario(id, usuario) {
     return await res.json();
 }
 
-/**
- * Elimina un usuario por ID.
- */
 export async function eliminarUsuario(id) {
     const res = await fetch(`${API_URL}/usuarios/${id}`, {
         method: "DELETE",
