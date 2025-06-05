@@ -1,11 +1,12 @@
 # rutas/usuario.py
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
 from esquemas.usuario import UsuarioCrear, UsuarioActualizar, UsuarioMostrar
 from servicios.usuario import (
     crear_usuario, obtener_usuarios, obtener_usuario, actualizar_usuario, eliminar_usuario
 )
 from typing import List
+from db import get_connection
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 
@@ -78,3 +79,37 @@ def eliminar(usuario_id: int):
         "mensaje": "Usuario eliminado exitosamente.",
         "id": usuario_id
     }
+
+@router.post("/login", response_model=dict)
+def login(datos: dict = Body(...)):
+    """
+    Login por username o email y password.
+    """
+    identificador = datos.get("identificador")
+    password = datos.get("password")
+    if not identificador or not password:
+        raise HTTPException(status_code=400, detail="Usuario/correo y contraseña son requeridos.")
+
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT id, nombre, area_id, username, email, rol, password, fecha_creacion FROM usuarios WHERE username = %s OR email = %s;",
+        (identificador, identificador)
+    )
+    user = cur.fetchone()
+    cur.close()
+    conn.close()
+    if user and user[6] == password:  # user[6] es el campo password
+        return {
+            "exito": True,
+            "usuario": {
+                "id": user[0],
+                "nombre": user[1],
+                "area_id": user[2],
+                "username": user[3],
+                "email": user[4],
+                "rol": user[5],
+                "fecha_creacion": user[7]
+            }
+        }
+    raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectos.")

@@ -20,7 +20,7 @@ CREATE TABLE usuarios (
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    rol VARCHAR(20) NOT NULL CHECK (rol IN ('admin', 'mesa_partes')) DEFAULT 'admin',
+    rol VARCHAR(20) NOT NULL DEFAULT 'admin',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
