@@ -30,35 +30,27 @@ def fetch_all_data():
     # Crea un cursor que devuelve resultados como diccionarios en lugar de tuplas
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    # Ejecuta consulta para obtener todos los usuarios
     cur.execute("SELECT * FROM usuarios;")
     usuarios = cur.fetchall()
 
-    # Ejecuta consulta para obtener todas las áreas
     cur.execute("SELECT * FROM areas;")
     areas = cur.fetchall()
 
-    # Ejecuta consulta para obtener todos los trámites externos
     cur.execute("SELECT * FROM tramites_externos;")
     tramites_externos = cur.fetchall()
 
-    # Ejecuta consulta para obtener todos los trámites internos
     cur.execute("SELECT * FROM tramites_internos;")
     tramites_internos = cur.fetchall()
 
-    # Ejecuta consulta para obtener todo el seguimiento de trámites
     cur.execute("SELECT * FROM seguimiento_tramites;")
     seguimiento_tramites = cur.fetchall()
 
-    # Ejecuta consulta para obtener todas las derivaciones
     cur.execute("SELECT * FROM derivaciones;")
     derivaciones = cur.fetchall()
 
-    # Ejecuta consulta para obtener todos los documentos generados
     cur.execute("SELECT * FROM documentos_generados;")
     documentos_generados = cur.fetchall()
 
-    # Cierra el cursor y la conexión para liberar recursos
     cur.close()
     conn.close()
 

@@ -20,7 +20,7 @@ import dateparser
 
 app = FastAPI()
 
-# Configuración CORS para React (puerto 5173 por defecto en Vite)
+# Configuración CORS para React-Vite
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
