@@ -1,13 +1,39 @@
 // src/components/BarraCabecera.jsx
+
 import "../styles/BarraCabecera.css";
 import { FaUserCircle, FaBuilding, FaChevronDown, FaSignOutAlt } from "react-icons/fa";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function BarraCabecera({ usuario }) {
+
+export default function BarraCabecera() {
+    const [usuario, setUsuario] = useState(() =>
+        JSON.parse(localStorage.getItem("usuario") || "{}")
+    );
+
     const [menuAbierto, setMenuAbierto] = useState(false);
     const menuRef = useRef();
     const navigate = useNavigate();
+
+    // Actualiza el usuario cada vez que se abre el menú (por si cambió el nombre)
+    useEffect(() => {
+        if (menuAbierto) {
+            const usuarioActualizado = JSON.parse(localStorage.getItem("usuario") || "{}");
+            setUsuario(usuarioActualizado);
+        }
+    }, [menuAbierto]);
+
+    // Escucha cambios en localStorage desde otras pestañas/ventanas
+    useEffect(() => {
+        function handleStorageChange(e) {
+            if (e.key === "usuario") {
+                const usuarioActualizado = JSON.parse(e.newValue || "{}");
+                setUsuario(usuarioActualizado);
+            }
+        }
+        window.addEventListener("storage", handleStorageChange);
+        return () => window.removeEventListener("storage", handleStorageChange);
+    }, []);
 
     // Cierra el menú si se hace clic fuera de él
     useEffect(() => {
@@ -40,8 +66,10 @@ export default function BarraCabecera({ usuario }) {
                 >
                     <FaUserCircle style={{ fontSize: "1.7rem", marginRight: "8px" }} />
                     <div className="cabecera-nombre-rol">
-                        <div>{usuario.nombre}</div>
-                        <div className="cabecera-rol">{usuario.rol.replace("_", " ")}</div>
+                        <div>{usuario.nombre || "Usuario"}</div>
+                        <div className="cabecera-rol">
+                            {usuario.rol ? usuario.rol.replace("_", " ") : ""}
+                        </div>
                     </div>
                     <FaChevronDown style={{ marginLeft: 8 }} />
                 </button>

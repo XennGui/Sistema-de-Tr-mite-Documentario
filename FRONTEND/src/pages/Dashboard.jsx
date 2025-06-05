@@ -1,9 +1,11 @@
 // src/pages/Dashboard.jsx
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Routes, Route } from "react-router-dom";
 import BarraCabecera from "../components/BarraCabecera";
 import MenuLateral from "../components/MenuLateral";
 import DashboardInicio from "./DashboardInicio";
+import Areas from "./Areas";
+import Usuarios from "./Usuarios";
 import "../styles/Dashboard.css";
 
 export default function Dashboard() {
@@ -22,17 +24,17 @@ export default function Dashboard() {
 
     if (!usuario) return null;
 
-    // Muestra DashboardInicio solo en /dashboard (no subrutas)
-    const isInicio = location.pathname === "/dashboard";
-
     return (
         <div className="dashboard-contenedor">
             <BarraCabecera usuario={usuario} />
             <div className="dashboard-main">
                 <MenuLateral rol={usuario.rol} />
                 <div className="dashboard-contenido">
-                    {isInicio && <DashboardInicio usuario={usuario} />}
-                    {/* Aquí puedes renderizar las otras rutas */}
+                    <Routes>
+                        <Route path="/" element={<DashboardInicio usuario={usuario} />} />
+                        <Route path="areas" element={<Areas />} />
+                        <Route path="usuarios" element={<Usuarios />} />
+                    </Routes>
                 </div>
             </div>
         </div>
