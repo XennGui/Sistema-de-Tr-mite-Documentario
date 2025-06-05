@@ -12,7 +12,6 @@ from typing import List
 
 router = APIRouter(prefix="/tramites-externos", tags=["Trámites Externos"])
 
-# Crear trámite externo
 @router.post("/", response_model=dict)
 def crear(tramite: TramiteExternoCrear):
     tramite_id, fecha_registro = crear_tramite_externo(tramite.dict())
@@ -25,7 +24,6 @@ def crear(tramite: TramiteExternoCrear):
         }
     }
 
-# Listar trámites externos
 @router.get("/", response_model=dict)
 def listar():
     tramites = obtener_tramites_externos()
@@ -35,7 +33,6 @@ def listar():
         "tramites": tramites
     }
 
-# Obtener trámite externo por ID
 @router.get("/{tramite_id}", response_model=dict)
 def obtener(tramite_id: int):
     tramite = obtener_tramite_externo(tramite_id)
@@ -46,7 +43,6 @@ def obtener(tramite_id: int):
         "tramite": tramite
     }
 
-# Actualizar trámite externo
 @router.put("/{tramite_id}", response_model=dict)
 def actualizar(tramite_id: int, tramite: TramiteExternoActualizar):
     datos = tramite.dict(exclude_unset=True)
@@ -59,7 +55,6 @@ def actualizar(tramite_id: int, tramite: TramiteExternoActualizar):
         "tramite": tramite_actual
     }
 
-# Eliminar trámite externo
 @router.delete("/{tramite_id}", response_model=dict)
 def eliminar(tramite_id: int):
     eliminado = eliminar_tramite_externo(tramite_id)

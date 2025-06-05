@@ -10,7 +10,6 @@ from db import get_connection
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 
-# Crear usuario
 @router.post("/", response_model=dict)
 def crear(usuario: UsuarioCrear):
     usuario_id, fecha_creacion = crear_usuario(
@@ -34,7 +33,6 @@ def crear(usuario: UsuarioCrear):
         }
     }
 
-# Listar usuarios
 @router.get("/", response_model=dict)
 def listar():
     usuarios = obtener_usuarios()
@@ -44,7 +42,6 @@ def listar():
         "usuarios": usuarios
     }
 
-# Obtener usuario por ID
 @router.get("/{usuario_id}", response_model=dict)
 def obtener(usuario_id: int):
     usuario = obtener_usuario(usuario_id)
@@ -55,7 +52,6 @@ def obtener(usuario_id: int):
         "usuario": usuario
     }
 
-# Actualizar usuario
 @router.put("/{usuario_id}", response_model=dict)
 def actualizar(usuario_id: int, usuario: UsuarioActualizar):
     datos = usuario.dict(exclude_unset=True)
@@ -69,7 +65,6 @@ def actualizar(usuario_id: int, usuario: UsuarioActualizar):
         "usuario": usuario_actual
     }
 
-# Eliminar usuario
 @router.delete("/{usuario_id}", response_model=dict)
 def eliminar(usuario_id: int):
     eliminado = eliminar_usuario(usuario_id)

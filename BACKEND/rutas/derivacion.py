@@ -1,10 +1,4 @@
 # rutas/derivacion.py
-# Rutas:
-#   - POST    /derivaciones/          : Crear derivación
-#   - GET     /derivaciones/          : Listar derivaciones
-#   - GET     /derivaciones/{id}      : Obtener derivación por ID
-#   - PUT     /derivaciones/{id}      : Actualizar derivación
-#   - DELETE  /derivaciones/{id}      : Eliminar derivación
 
 from fastapi import APIRouter, HTTPException
 from esquemas.derivacion import (

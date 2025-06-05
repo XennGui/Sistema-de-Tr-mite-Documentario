@@ -29,8 +29,8 @@ def obtener_tramites_externos():
     cur = conn.cursor()
     cur.execute("""
         SELECT id, numero_expediente, codigo_seguridad, remitente, tipo_documento, folios, asunto, contenido, archivo,
-               tipo_persona, dni_ruc, email, telefono, estado, prioridad, fecha_registro, fecha_vencimiento,
-               usuario_registro_id, area_actual_id
+                tipo_persona, dni_ruc, email, telefono, estado, prioridad, fecha_registro, fecha_vencimiento,
+                usuario_registro_id, area_actual_id
         FROM tramites_externos;
     """)
     rows = cur.fetchall()
@@ -66,8 +66,8 @@ def obtener_tramite_externo(tramite_id):
     cur = conn.cursor()
     cur.execute("""
         SELECT id, numero_expediente, codigo_seguridad, remitente, tipo_documento, folios, asunto, contenido, archivo,
-               tipo_persona, dni_ruc, email, telefono, estado, prioridad, fecha_registro, fecha_vencimiento,
-               usuario_registro_id, area_actual_id
+                tipo_persona, dni_ruc, email, telefono, estado, prioridad, fecha_registro, fecha_vencimiento,
+                usuario_registro_id, area_actual_id
         FROM tramites_externos WHERE id = %s;
     """, (tramite_id,))
     r = cur.fetchone()

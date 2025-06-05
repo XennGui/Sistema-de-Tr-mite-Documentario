@@ -27,7 +27,7 @@ def obtener_derivaciones():
     cur = conn.cursor()
     cur.execute("""
         SELECT id, tramite_id, tramite_type, area_origen_id, area_destino_id,
-               usuario_derivacion_id, fecha_derivacion, instrucciones, fecha_limite
+                usuario_derivacion_id, fecha_derivacion, instrucciones, fecha_limite
         FROM derivaciones;
     """)
     rows = cur.fetchall()
@@ -53,7 +53,7 @@ def obtener_derivacion(derivacion_id):
     cur = conn.cursor()
     cur.execute("""
         SELECT id, tramite_id, tramite_type, area_origen_id, area_destino_id,
-               usuario_derivacion_id, fecha_derivacion, instrucciones, fecha_limite
+                usuario_derivacion_id, fecha_derivacion, instrucciones, fecha_limite
         FROM derivaciones WHERE id = %s;
     """, (derivacion_id,))
     r = cur.fetchone()

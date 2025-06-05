@@ -30,8 +30,8 @@ def obtener_tramites_internos():
     cur = conn.cursor()
     cur.execute("""
         SELECT id, numero_referencia, asunto, contenido, folios, archivo,
-               remitente_id, area_origen_id, area_destino_id, estado, prioridad,
-               fecha_envio, fecha_recepcion, fecha_vencimiento
+                remitente_id, area_origen_id, area_destino_id, estado, prioridad,
+                fecha_envio, fecha_recepcion, fecha_vencimiento
         FROM tramites_internos;
     """)
     rows = cur.fetchall()
@@ -62,8 +62,8 @@ def obtener_tramite_interno(tramite_id):
     cur = conn.cursor()
     cur.execute("""
         SELECT id, numero_referencia, asunto, contenido, folios, archivo,
-               remitente_id, area_origen_id, area_destino_id, estado, prioridad,
-               fecha_envio, fecha_recepcion, fecha_vencimiento
+                remitente_id, area_origen_id, area_destino_id, estado, prioridad,
+                fecha_envio, fecha_recepcion, fecha_vencimiento
         FROM tramites_internos WHERE id = %s;
     """, (tramite_id,))
     r = cur.fetchone()

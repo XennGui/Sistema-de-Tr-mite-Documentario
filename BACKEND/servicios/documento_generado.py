@@ -27,7 +27,7 @@ def obtener_documentos_generados():
     cur = conn.cursor()
     cur.execute("""
         SELECT id, tramite_id, tramite_type, tipo_documento, contenido, archivo,
-               usuario_generador_id, fecha_creacion, firmado, fecha_firma
+                usuario_generador_id, fecha_creacion, firmado, fecha_firma
         FROM documentos_generados;
     """)
     rows = cur.fetchall()
@@ -54,7 +54,7 @@ def obtener_documento_generado(documento_id):
     cur = conn.cursor()
     cur.execute("""
         SELECT id, tramite_id, tramite_type, tipo_documento, contenido, archivo,
-               usuario_generador_id, fecha_creacion, firmado, fecha_firma
+                usuario_generador_id, fecha_creacion, firmado, fecha_firma
         FROM documentos_generados WHERE id = %s;
     """, (documento_id,))
     r = cur.fetchone()

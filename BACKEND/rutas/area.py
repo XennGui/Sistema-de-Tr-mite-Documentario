@@ -9,7 +9,6 @@ from typing import List
 
 router = APIRouter(prefix="/areas", tags=["Áreas"])
 
-# Crear área
 @router.post("/", response_model=dict)
 def crear(area: AreaCrear):
     area_id = crear_area(area.nombre, area.descripcion)
@@ -22,7 +21,6 @@ def crear(area: AreaCrear):
         }
     }
 
-# Listar áreas
 @router.get("/", response_model=dict)
 def listar():
     areas = obtener_areas()
@@ -32,7 +30,6 @@ def listar():
         "areas": areas
     }
 
-# Obtener área por ID
 @router.get("/{area_id}", response_model=dict)
 def obtener(area_id: int):
     area = obtener_area(area_id)
@@ -43,7 +40,6 @@ def obtener(area_id: int):
         "area": area
     }
 
-# Actualizar área
 @router.put("/{area_id}", response_model=dict)
 def actualizar(area_id: int, area: AreaActualizar):
     actualizado = actualizar_area(area_id, area.nombre, area.descripcion)
@@ -58,7 +54,6 @@ def actualizar(area_id: int, area: AreaActualizar):
         }
     }
 
-# Eliminar área
 @router.delete("/{area_id}", response_model=dict)
 def eliminar(area_id: int):
     eliminado = eliminar_area(area_id)

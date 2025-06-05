@@ -26,7 +26,7 @@ def obtener_seguimientos_tramite():
     cur = conn.cursor()
     cur.execute("""
         SELECT id, tramite_id, tramite_type, accion, descripcion,
-               usuario_id, area_id, adjunto, observaciones, fecha_hora
+                usuario_id, area_id, adjunto, observaciones, fecha_hora
         FROM seguimiento_tramites;
     """)
     rows = cur.fetchall()
@@ -53,7 +53,7 @@ def obtener_seguimiento_tramite(seguimiento_id):
     cur = conn.cursor()
     cur.execute("""
         SELECT id, tramite_id, tramite_type, accion, descripcion,
-               usuario_id, area_id, adjunto, observaciones, fecha_hora
+                usuario_id, area_id, adjunto, observaciones, fecha_hora
         FROM seguimiento_tramites WHERE id = %s;
     """, (seguimiento_id,))
     r = cur.fetchone()
