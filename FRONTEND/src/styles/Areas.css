@@ -1,0 +1,228 @@
+/* src/styles/Areas.css */
+
+.areas-contenedor {
+    padding: 2rem 1.5rem;
+    width: 100%;
+}
+
+.areas-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+}
+
+.areas-header h2 {
+    color: #0a457c;
+    font-size: 1.45rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.areas-btn-nuevo {
+    padding: 0.45rem 1.2rem;
+    background: #0a457c;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.areas-btn-nuevo:hover {
+    background: #08325b;
+}
+
+.areas-busqueda {
+    margin-bottom: 1.2rem;
+}
+
+.areas-busqueda input {
+    padding: 0.42rem 1rem;
+    border: 1.5px solid #bbc8da;
+    border-radius: 8px;
+    width: 300px;
+    max-width: 100%;
+    font-size: 1rem;
+    outline: none;
+}
+
+.areas-cargando {
+    padding: 2rem 0;
+    color: #0a457c;
+    text-align: center;
+    font-size: 1.08rem;
+}
+
+.areas-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 15px #e4e8f0;
+}
+
+.areas-tabla th,
+.areas-tabla td {
+    padding: 0.75rem .8rem;
+    text-align: left;
+}
+
+.areas-tabla th {
+    background: #e9f3fb;
+    color: #0a457c;
+    font-weight: 600;
+}
+
+.areas-tabla tbody tr:nth-child(even) {
+    background: #f5f7fa;
+}
+
+.areas-tabla td {
+    color: #333;
+    font-size: 1rem;
+}
+
+.areas-tabla td:last-child {
+    white-space: nowrap;
+}
+
+.areas-btn-editar {
+    background: #e9f3fb;
+    color: #0a457c;
+    border: none;
+    border-radius: 6px;
+    padding: 0.35rem .62rem;
+    margin-right: 0.4rem;
+    cursor: pointer;
+    font-size: 1.02rem;
+}
+
+.areas-btn-editar:hover {
+    background: #d1e6f9;
+}
+
+.areas-btn-eliminar {
+    background: #ffeaea;
+    color: #d60000;
+    border: none;
+    border-radius: 6px;
+    padding: 0.35rem .62rem;
+    cursor: pointer;
+    font-size: 1.02rem;
+}
+
+.areas-btn-eliminar:hover {
+    background: #ffd6d6;
+}
+
+/* Modal */
+.areas-modal-fondo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(40, 54, 80, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 11;
+}
+
+.areas-modal {
+    background: #fff;
+    padding: 2rem 2.2rem 1.5rem 2.2rem;
+    border-radius: 16px;
+    min-width: 340px;
+    max-width: 95%;
+    box-shadow: 0 4px 19px #b3c3d8;
+}
+
+.areas-modal h3 {
+    color: #0a457c;
+    font-size: 1.17rem;
+    margin-top: 0;
+    margin-bottom: 1.1rem;
+    font-weight: 700;
+}
+
+.areas-form-grupo {
+    margin-bottom: 1rem;
+}
+
+.areas-form-grupo label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: .27rem;
+    color: #08325b;
+}
+
+.areas-form-grupo label span {
+    color: #d60000;
+}
+
+.areas-form-grupo input,
+.areas-form-grupo textarea {
+    width: 100%;
+    padding: 0.47rem 0.7rem;
+    border: 1.5px solid #bbc8da;
+    border-radius: 7px;
+    font-size: 1rem;
+    outline: none;
+    font-family: inherit;
+    resize: none;
+}
+
+.areas-error {
+    color: #d60000;
+    background: #ffeaea;
+    padding: 0.65rem 1rem;
+    border-radius: 7px;
+    font-size: 1rem;
+    margin-bottom: .7rem;
+    margin-top: .5rem;
+    text-align: center;
+}
+
+.areas-form-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.4rem;
+}
+
+.areas-btn-cancelar {
+    background: #f3f6fa;
+    color: #0a457c;
+    border: 1.5px solid #0a457c;
+    padding: 0.5rem 1.5rem;
+    border-radius: 7px;
+    font-weight: 600;
+    font-size: 1.03rem;
+    cursor: pointer;
+}
+
+.areas-btn-cancelar:hover {
+    background: #e3eefa;
+}
+
+.areas-btn-guardar {
+    background: #0a457c;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 7px;
+    font-weight: 600;
+    font-size: 1.03rem;
+    cursor: pointer;
+}
+
+.areas-btn-guardar:hover {
+    background: #08325b;
+}
