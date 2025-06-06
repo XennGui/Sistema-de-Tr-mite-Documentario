@@ -168,3 +168,27 @@ def buscar_tramite_externo_por_expediente_y_codigo(numero_expediente, codigo_seg
             "area_actual_id": r[18]
         }
     return None
+
+def obtener_tramites_externos():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM tramites_externos ORDER BY fecha_registro DESC;")
+    rows = cur.fetchall()
+    colnames = [desc[0] for desc in cur.description]
+    cur.close()
+    conn.close()
+    return [dict(zip(colnames, row)) for row in rows]
+
+def obtener_tramites_externos_por_area(area_id):
+    from db import get_connection
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT * FROM tramites_externos WHERE area_actual_id = %s ORDER BY fecha_registro DESC;",
+        (area_id,)
+    )
+    rows = cur.fetchall()
+    colnames = [desc[0] for desc in cur.description]
+    cur.close()
+    conn.close()
+    return [dict(zip(colnames, row)) for row in rows]
