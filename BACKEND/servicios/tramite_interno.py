@@ -157,3 +157,4 @@ def obtener_tramites_internos_por_area(area_id):
         }
         for r in rows
     ]
+

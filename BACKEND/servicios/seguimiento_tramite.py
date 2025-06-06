@@ -137,3 +137,31 @@ def obtener_seguimiento_de_tramite_externo(tramite_id):
         }
         for row in rows
     ]
+
+def obtener_seguimiento_de_tramite_interno(tramite_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id, tramite_id, tramite_type, accion, descripcion, usuario_id, area_id, adjunto, observaciones, fecha_hora
+        FROM seguimiento_tramites
+        WHERE tramite_id = %s AND tramite_type = 'interno'
+        ORDER BY fecha_hora ASC;
+    """, (tramite_id,))
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return [
+        {
+            "id": r[0],
+            "tramite_id": r[1],
+            "tramite_type": r[2],
+            "accion": r[3],
+            "descripcion": r[4],
+            "usuario_id": r[5],
+            "area_id": r[6],
+            "adjunto": r[7],
+            "observaciones": r[8],
+            "fecha_hora": r[9],
+        }
+        for r in rows
+    ]
