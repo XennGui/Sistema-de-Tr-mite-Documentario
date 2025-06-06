@@ -132,3 +132,39 @@ def eliminar_tramite_externo(tramite_id):
     cur.close()
     conn.close()
     return result is not None
+
+def buscar_tramite_externo_por_expediente_y_codigo(numero_expediente, codigo_seguridad):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id, numero_expediente, codigo_seguridad, remitente, tipo_documento, folios, asunto, contenido, archivo,
+                tipo_persona, dni_ruc, email, telefono, estado, prioridad, fecha_registro, fecha_vencimiento,
+                usuario_registro_id, area_actual_id
+        FROM tramites_externos WHERE numero_expediente=%s AND codigo_seguridad=%s;
+    """, (numero_expediente, codigo_seguridad))
+    r = cur.fetchone()
+    cur.close()
+    conn.close()
+    if r:
+        return {
+            "id": r[0],
+            "numero_expediente": r[1],
+            "codigo_seguridad": r[2],
+            "remitente": r[3],
+            "tipo_documento": r[4],
+            "folios": r[5],
+            "asunto": r[6],
+            "contenido": r[7],
+            "archivo": r[8],
+            "tipo_persona": r[9],
+            "dni_ruc": r[10],
+            "email": r[11],
+            "telefono": r[12],
+            "estado": r[13],
+            "prioridad": r[14],
+            "fecha_registro": r[15],
+            "fecha_vencimiento": r[16],
+            "usuario_registro_id": r[17],
+            "area_actual_id": r[18]
+        }
+    return None

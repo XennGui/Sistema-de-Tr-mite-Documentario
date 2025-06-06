@@ -66,4 +66,3 @@ class TramiteExternoMostrar(BaseModel):
 
     class Config:
         from_attributes = True  # en vez de orm_mode para Pydantic v2  
-            

@@ -26,4 +26,3 @@ class TramiteExterno:
         self.fecha_vencimiento = fecha_vencimiento
         self.usuario_registro_id = usuario_registro_id
         self.area_actual_id = area_actual_id
-        

@@ -1,27 +1,141 @@
 # rutas/tramite_externo.py
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Query
 from esquemas.tramite_externo import (
     TramiteExternoCrear, TramiteExternoActualizar, TramiteExternoMostrar
 )
 from servicios.tramite_externo import (
     crear_tramite_externo, obtener_tramites_externos, obtener_tramite_externo,
-    actualizar_tramite_externo, eliminar_tramite_externo
+    actualizar_tramite_externo, eliminar_tramite_externo, buscar_tramite_externo_por_expediente_y_codigo
 )
+from servicios.seguimiento_tramite import obtener_seguimiento_de_tramite_externo
 from typing import List
+import os
+import random
+import string
+from datetime import datetime
+import pytz
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 router = APIRouter(prefix="/tramites-externos", tags=["Trámites Externos"])
 
+MESA_PARTES_CORREO = "xennia.guissel@gmail.com"
+MESA_PARTES_CLAVE = "familiaITO1972"
+
+def enviar_correo_a_mesa(tramite):
+    asunto = f"Nuevo trámite externo registrado: {tramite['numero_expediente']}"
+    cuerpo = f"""
+Se ha registrado un nuevo trámite externo en la plataforma municipal:
+
+- Nº expediente: {tramite['numero_expediente']}
+- Remitente: {tramite['remitente']}
+- Tipo de documento: {tramite['tipo_documento']}
+- Folios: {tramite['folios']}
+- Asunto: {tramite['asunto']}
+- Código de seguridad: {tramite['codigo_seguridad']}
+- Fecha y Hora: {tramite['fecha_registro']}
+- Correo: {tramite['email']}
+- Teléfono: {tramite['telefono'] or '-'}
+    """
+
+    msg = MIMEMultipart()
+    msg["From"] = MESA_PARTES_CORREO
+    msg["To"] = MESA_PARTES_CORREO
+    msg["Subject"] = asunto
+    msg.attach(MIMEText(cuerpo, "plain"))
+
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(MESA_PARTES_CORREO, MESA_PARTES_CLAVE)
+            server.sendmail(MESA_PARTES_CORREO, MESA_PARTES_CORREO, msg.as_string())
+    except Exception as e:
+        print("Error enviando correo:", e)
+
+def generar_codigo_seguridad(longitud=8):
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=longitud))
+
+def generar_numero_expediente():
+    tz = pytz.timezone("America/Lima")
+    fecha = datetime.now(tz).strftime("%Y%m%d")
+    nro = ''.join(random.choices(string.digits, k=5))
+    return f"{fecha}-{nro}"
+
 @router.post("/", response_model=dict)
-def crear(tramite: TramiteExternoCrear):
-    tramite_id, fecha_registro = crear_tramite_externo(tramite.dict())
+async def crear_tramite(
+    remitente: str = Form(...),
+    tipo_documento: str = Form(...),
+    folios: int = Form(...),
+    asunto: str = Form(...),
+    contenido: str = Form(""),
+    archivo: UploadFile = File(None),
+    tipo_persona: str = Form(...),
+    dni_ruc: str = Form(...),
+    email: str = Form(...),
+    telefono: str = Form(""),
+):
+    archivo_nombre = None
+    if archivo:
+        os.makedirs("archivos_tramites", exist_ok=True)
+        nombre_base = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{archivo.filename}"
+        ruta = os.path.join("archivos_tramites", nombre_base)
+        with open(ruta, "wb") as f:
+            contenido_pdf = await archivo.read()
+            f.write(contenido_pdf)
+        archivo_nombre = ruta
+
+    tz = pytz.timezone("America/Lima")
+    fecha_actual = datetime.now(tz)
+    numero_expediente = generar_numero_expediente()
+    codigo_seguridad = generar_codigo_seguridad()
+
+    datos = {
+        "numero_expediente": numero_expediente,
+        "codigo_seguridad": codigo_seguridad,
+        "remitente": remitente,
+        "tipo_documento": tipo_documento,
+        "folios": folios,
+        "asunto": asunto,
+        "contenido": contenido,
+        "archivo": archivo_nombre,
+        "tipo_persona": tipo_persona,
+        "dni_ruc": dni_ruc,
+        "email": email,
+        "telefono": telefono,
+        "estado": "pendiente",
+        "prioridad": 3,
+        "fecha_vencimiento": None,
+        "usuario_registro_id": None,
+        "area_actual_id": None
+    }
+    tramite_id, fecha_registro = crear_tramite_externo(datos)
+
+    if isinstance(fecha_registro, datetime):
+        fecha_registro_lima = fecha_registro.astimezone(tz)
+    else:
+        fecha_registro_lima = fecha_actual
+
+    fecha_registro_str = fecha_registro_lima.strftime("%d/%m/%Y, %H:%M:%S")
+
+    tramite = {
+        **datos,
+        "id": tramite_id,
+        "fecha_registro": fecha_registro_str
+    }
+
+    try:
+        enviar_correo_a_mesa({
+            **tramite,
+            "fecha_registro": fecha_registro_str
+        })
+    except Exception as e:
+        print(f"Error al enviar correo a mesa de partes: {e}")
+
     return {
-        "mensaje": "Trámite externo creado exitosamente.",
-        "tramite": {
-            **tramite.dict(),
-            "id": tramite_id,
-            "fecha_registro": fecha_registro
-        }
+        "mensaje": "Su documento se ha registrado exitosamente",
+        "tramite": tramite
     }
 
 @router.get("/", response_model=dict)
@@ -31,6 +145,27 @@ def listar():
         "mensaje": "Lista de trámites externos.",
         "total": len(tramites),
         "tramites": tramites
+    }
+
+@router.get("/buscar", response_model=dict)
+def buscar_tramite(
+    numero_expediente: str = Query(...),
+    codigo_seguridad: str = Query(...)
+):
+    tramite = buscar_tramite_externo_por_expediente_y_codigo(numero_expediente, codigo_seguridad)
+    if not tramite:
+        raise HTTPException(status_code=404, detail="No se encontró el trámite con esos datos.")
+    return {
+        "mensaje": "Trámite encontrado.",
+        "tramite": tramite
+    }
+
+@router.get("/{tramite_id}/seguimiento", response_model=dict)
+def seguimiento_tramite(tramite_id: int):
+    movimientos = obtener_seguimiento_de_tramite_externo(tramite_id)
+    return {
+        "mensaje": "Seguimiento del trámite.",
+        "seguimiento": movimientos
     }
 
 @router.get("/{tramite_id}", response_model=dict)
