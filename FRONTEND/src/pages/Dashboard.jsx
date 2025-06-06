@@ -1,4 +1,4 @@
-// src/pages/Dashboard.jsx
+// RUTA: src/pages/Dashboard.jsx
 
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation, Routes, Route } from "react-router-dom";
@@ -7,6 +7,8 @@ import MenuLateral from "../components/MenuLateral";
 import DashboardInicio from "./DashboardInicio";
 import Areas from "./Areas";
 import Usuarios from "./Usuarios";
+import TramitesExternos from "./TramitesExternos";
+import TramitesInternos from "./TramitesInternos";
 import "../styles/Dashboard.css";
 
 export default function Dashboard() {
@@ -35,6 +37,8 @@ export default function Dashboard() {
                         <Route path="/" element={<DashboardInicio usuario={usuario} />} />
                         <Route path="areas" element={<Areas />} />
                         <Route path="usuarios" element={<Usuarios />} />
+                        <Route path="tramites-externos" element={<TramitesExternos usuarioLogueado={usuario} />} />
+                        <Route path="tramites-internos" element={<TramitesInternos usuarioLogueado={usuario} />} />
                     </Routes>
                 </div>
             </div>

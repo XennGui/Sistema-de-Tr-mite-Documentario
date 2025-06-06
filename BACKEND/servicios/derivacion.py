@@ -2,6 +2,31 @@
 
 from db import get_connection
 
+def registrar_derivacion(data):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO derivaciones (
+            tramite_id, tramite_type, area_origen_id, area_destino_id,
+            usuario_derivacion_id, instrucciones, fecha_limite
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
+    """, (
+        data["tramite_id"],
+        data["tramite_type"],
+        data["area_origen_id"],
+        data["area_destino_id"],
+        data["usuario_derivacion_id"],
+        data.get("instrucciones"),
+        data.get("fecha_limite"),
+    ))
+    derivacion_id = cur.fetchone()[0]
+    conn.commit()
+    cur.close()
+    conn.close()
+    return derivacion_id
+
 def crear_derivacion(datos):
     conn = get_connection()
     cur = conn.cursor()
@@ -107,3 +132,4 @@ def eliminar_derivacion(derivacion_id):
     cur.close()
     conn.close()
     return result is not None
+

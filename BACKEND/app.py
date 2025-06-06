@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles 
 from rutas.area import router as area_router
 from rutas.usuario import router as usuario_router
 from rutas.tramite_externo import router as tramite_externo_router
@@ -19,6 +20,9 @@ import re
 import dateparser
 
 app = FastAPI()
+
+app.mount("/archivos_tramites", StaticFiles(directory="archivos_tramites"), name="archivos_tramites")
+app.mount("/respuestas_tramites", StaticFiles(directory="respuestas_tramites"), name="respuestas_tramites")
 
 # Configuración CORS para React-Vite
 app.add_middleware(

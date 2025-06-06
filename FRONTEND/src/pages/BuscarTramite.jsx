@@ -1,9 +1,25 @@
-// src/pages/BuscarTramite.jsx
-
+// RUTA: src/pages/BuscarTramite.jsx
 import { useState } from "react";
 import { FaSearch, FaFileAlt, FaUser, FaEnvelope, FaPhone, FaIdCard, FaListAlt, FaFilePdf, FaClock } from "react-icons/fa";
 import BarraSuperior from "../components/BarraSuperior";
 import "../styles/BuscarTramite.css";
+
+function formatearFecha(fechaIso) {
+    if (!fechaIso) return "-";
+    try {
+        const fecha = new Date(fechaIso);
+        return fecha.toLocaleString("es-PE", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
+    } catch {
+        return fechaIso;
+    }
+}
 
 export default function BuscarTramite() {
     const [expediente, setExpediente] = useState("");
@@ -12,6 +28,7 @@ export default function BuscarTramite() {
     const [tramite, setTramite] = useState(null);
     const [seguimiento, setSeguimiento] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [pdfUrl, setPdfUrl] = useState(""); // Visor PDF
 
     const handleBuscar = async (e) => {
         e.preventDefault();
@@ -24,14 +41,14 @@ export default function BuscarTramite() {
         }
         setLoading(true);
         try {
-            // 1. Buscar trámite
+            // Buscar trámite
             const url = `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/tramites-externos/buscar?numero_expediente=${encodeURIComponent(expediente)}&codigo_seguridad=${encodeURIComponent(codigo)}`;
             const res = await fetch(url);
             const data = await res.json();
             if (!res.ok) throw new Error(data.detail || "No se encontró el trámite.");
             setTramite(data.tramite);
 
-            // 2. Buscar seguimiento del trámite
+            // Buscar seguimiento del trámite
             const urlSeg = `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/tramites-externos/${data.tramite.id}/seguimiento`;
             const resSeg = await fetch(urlSeg);
             const dataSeg = await resSeg.json();
@@ -40,6 +57,14 @@ export default function BuscarTramite() {
             setError(err.message);
         }
         setLoading(false);
+    };
+
+    const abrirPDF = (ruta) => {
+        let url = ruta;
+        if (!/^https?:\/\//.test(ruta)) {
+            url = `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/${ruta}`;
+        }
+        setPdfUrl(url);
     };
 
     return (
@@ -84,7 +109,7 @@ export default function BuscarTramite() {
                         <div className="tramite-info-formulario">
                             <div>
                                 <label><FaClock className="ti-icon" /> Fecha y Hora:</label>
-                                <div>{new Date(tramite.fecha_registro).toLocaleString()}</div>
+                                <div>{formatearFecha(tramite.fecha_registro)}</div>
                             </div>
                             <div>
                                 <label><FaUser className="ti-icon" /> Remitente:</label>
@@ -122,6 +147,18 @@ export default function BuscarTramite() {
                                 <label><FaListAlt className="ti-icon" /> Estado:</label>
                                 <div>{tramite.estado}</div>
                             </div>
+                            <div style={{ marginTop: 16 }}>
+                                <label><FaFilePdf className="ti-icon" /> Documento PDF enviado:</label>
+                                {tramite.archivo ? (
+                                    <button
+                                        className="btn-verpdf"
+                                        onClick={() => abrirPDF(tramite.archivo)}
+                                        type="button"
+                                    >
+                                        <FaFilePdf /> Ver PDF
+                                    </button>
+                                ) : <span style={{ color: "#888" }}>No disponible</span>}
+                            </div>
                         </div>
                     </div>
                 )}
@@ -136,41 +173,85 @@ export default function BuscarTramite() {
                             <table className="seguimiento-table">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
                                         <th>Fecha/Hora</th>
                                         <th>Acción</th>
                                         <th>Descripción</th>
-                                        <th>Adjunto</th>
-                                        <th>Usuario</th>
                                         <th>Área</th>
                                         <th>Observaciones</th>
+                                        <th>Adjunto PDF</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {seguimiento.length > 0 ? seguimiento.map((mov, i) => (
                                         <tr key={mov.id || i}>
-                                            <td>{mov.id}</td>
-                                            <td>{new Date(mov.fecha_hora).toLocaleString()}</td>
+                                            <td>{formatearFecha(mov.fecha_hora)}</td>
                                             <td>{mov.accion}</td>
                                             <td>{mov.descripcion}</td>
+                                            <td>{mov.area || "-"}</td>
+                                            <td>{mov.observaciones || "Ninguno"}</td>
                                             <td>
                                                 {mov.adjunto ? (
-                                                    <a href={mov.adjunto} target="_blank" rel="noopener noreferrer">
+                                                    <button
+                                                        className="btn-verpdf"
+                                                        onClick={() => abrirPDF(mov.adjunto)}
+                                                        type="button"
+                                                        style={{ color: "#d32f2f", fontSize: 16 }}
+                                                    >
                                                         <FaFilePdf /> Ver
-                                                    </a>
+                                                    </button>
                                                 ) : "-"}
                                             </td>
-                                            <td>{mov.usuario || "-"}</td>
-                                            <td>{mov.area || "-"}</td>
-                                            <td>{mov.observaciones || "-"}</td>
                                         </tr>
                                     )) : (
                                         <tr>
-                                            <td colSpan={8} style={{ textAlign: "center", color: "#888" }}>No hay movimientos registrados.</td>
+                                            <td colSpan={6} style={{ textAlign: "center", color: "#888" }}>No hay movimientos registrados.</td>
                                         </tr>
                                     )}
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                )}
+
+                {/* MODAL VISOR PDF GRANDE */}
+                {pdfUrl && (
+                    <div
+                        style={{
+                            position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+                            background: "rgba(30,40,60,0.22)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000
+                        }}
+                        onClick={() => setPdfUrl("")}
+                    >
+                        <div
+                            style={{
+                                background: "#fff", borderRadius: 14, boxShadow: "0 4px 40px rgba(0,0,0,0.23)",
+                                width: "92vw", maxWidth: 1100, minHeight: "70vh", padding: 0, position: "relative"
+                            }}
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <iframe
+                                src={pdfUrl}
+                                title="PDF"
+                                width="100%"
+                                height="700px"
+                                style={{ border: 0, display: "block", borderRadius: "14px 14px 0 0" }}
+                            />
+                            <button
+                                style={{
+                                    display: "block",
+                                    margin: "12px auto 25px auto",
+                                    padding: "10px 36px",
+                                    border: "none",
+                                    borderRadius: 6,
+                                    background: "#2d7ff9",
+                                    color: "white",
+                                    fontSize: 18,
+                                    cursor: "pointer"
+                                }}
+                                onClick={() => setPdfUrl("")}
+                            >
+                                Cerrar PDF
+                            </button>
                         </div>
                     </div>
                 )}
