@@ -1,0 +1,114 @@
+/* RUTA: src/styles/TramitesInternos.css */
+
+.tramites-internos-page {
+    padding: 24px 32px;
+    background: #fafbfd;
+    min-height: 80vh;
+}
+
+.tramites-internos-page h2 {
+    font-size: 1.6rem;
+    color: #1a237e;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.btn-crear, .btn-eliminar {
+    background: #1a237e;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 16px;
+    margin: 8px 3px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.btn-crear:hover { background: #3949ab; }
+.btn-eliminar {
+    background: #e53935;
+}
+.btn-eliminar:hover {
+    background: #b71c1c;
+}
+
+.form-tramite-interno {
+    background: #fff;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 15px 0 25px 0;
+    box-shadow: 0 1px 8px 0 #dde2f1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 19px 18px;
+}
+.form-tramite-interno > div {
+    flex: 1 1 220px;
+    min-width: 180px;
+    margin-bottom: 7px;
+}
+.form-tramite-interno label {
+    font-size: 13px;
+    color: #2d3748;
+    display: block;
+    margin-bottom: 4px;
+}
+.form-tramite-interno input,
+.form-tramite-interno textarea {
+    width: 100%;
+    border: 1px solid #b0bec5;
+    border-radius: 4px;
+    padding: 7px 8px;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+.form-tramite-interno textarea { min-height: 42px; }
+
+.tramites-internos-page table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 8px 0 #dde2f1;
+    overflow: hidden;
+    margin-top: 12px;
+}
+
+.tramites-internos-page th,
+.tramites-internos-page td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #e8eaf6;
+    font-size: 15px;
+}
+
+.tramites-internos-page th {
+    background: #eceff1;
+    color: #374151;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.tramites-internos-page tr:last-child td {
+    border-bottom: none;
+}
+
+.tramites-internos-page tbody tr:hover {
+    background: #f5faff;
+}
+
+.tramites-internos-page .error {
+    color: #c0392b;
+    font-weight: 500;
+    padding: 12px 0;
+}
+
+@media (max-width: 800px) {
+    .tramites-internos-page {
+        padding: 12px 2vw;
+    }
+    .tramites-internos-page th,
+    .tramites-internos-page td {
+        font-size: 13px;
+        padding: 7px 4px;
+    }
+}

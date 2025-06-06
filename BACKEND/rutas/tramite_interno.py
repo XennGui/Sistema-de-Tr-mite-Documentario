@@ -1,12 +1,13 @@
-# rutas/tramite_interno.py
+# RUTA: rutas/tramite_interno.py
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from esquemas.tramite_interno import (
-    TramiteInternoCrear, TramiteInternoActualizar, TramiteInternoMostrar
+    TramiteInternoCrear, TramiteInternoActualizar
 )
 from servicios.tramite_interno import (
     crear_tramite_interno, obtener_tramites_internos, obtener_tramite_interno,
-    actualizar_tramite_interno, eliminar_tramite_interno
+    actualizar_tramite_interno, eliminar_tramite_interno,
+    obtener_tramites_internos_por_area
 )
 from typing import List
 
@@ -25,8 +26,29 @@ def crear(tramite: TramiteInternoCrear):
     }
 
 @router.get("/", response_model=dict)
-def listar():
-    tramites = obtener_tramites_internos()
+def listar(
+    rol: str = Query(..., description="Rol del usuario logueado"),
+    area_id: int = Query(None, description="Área del usuario logueado (si no es admin ni mesa_partes)")
+):
+    """
+    Devuelve trámites internos según el rol:
+    - admin y mesa_partes: todos los trámites internos
+    - otro rol: solo trámites internos de su área de destino
+    """
+    if rol in ("admin", "mesa_partes"):
+        tramites = obtener_tramites_internos()
+    else:
+        if area_id is None:
+            return {"mensaje": "Falta área", "total": 0, "tramites": []}
+        tramites = obtener_tramites_internos_por_area(area_id)
+    # Asegura formato ISO para fechas
+    for t in tramites:
+        if t["fecha_envio"] and not isinstance(t["fecha_envio"], str):
+            t["fecha_envio"] = t["fecha_envio"].isoformat()
+        if t["fecha_recepcion"] and not isinstance(t["fecha_recepcion"], str):
+            t["fecha_recepcion"] = t["fecha_recepcion"].isoformat()
+        if t["fecha_vencimiento"] and not isinstance(t["fecha_vencimiento"], str):
+            t["fecha_vencimiento"] = t["fecha_vencimiento"].isoformat()
     return {
         "mensaje": "Lista de trámites internos.",
         "total": len(tramites),

@@ -123,3 +123,37 @@ def eliminar_tramite_interno(tramite_id):
     cur.close()
     conn.close()
     return result is not None
+
+def obtener_tramites_internos_por_area(area_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id, numero_referencia, asunto, contenido, folios, archivo,
+            remitente_id, area_origen_id, area_destino_id, estado, prioridad,
+            fecha_envio, fecha_recepcion, fecha_vencimiento
+        FROM tramites_internos
+        WHERE area_destino_id = %s
+        ORDER BY fecha_envio DESC;
+    """, (area_id,))
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return [
+        {
+            "id": r[0],
+            "numero_referencia": r[1],
+            "asunto": r[2],
+            "contenido": r[3],
+            "folios": r[4],
+            "archivo": r[5],
+            "remitente_id": r[6],
+            "area_origen_id": r[7],
+            "area_destino_id": r[8],
+            "estado": r[9],
+            "prioridad": r[10],
+            "fecha_envio": r[11],
+            "fecha_recepcion": r[12],
+            "fecha_vencimiento": r[13],
+        }
+        for r in rows
+    ]
