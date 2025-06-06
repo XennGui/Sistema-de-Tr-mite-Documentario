@@ -1,0 +1,207 @@
+/* RUTA: src/styles/TramitesExternos.css */
+/* Mantén el CSS igual, sólo asegúrate que esté en el archivo indicado, es compatible con la nueva página */
+
+.tramites-externos-page {
+    padding: 24px;
+    background: #f6f8fc;
+    min-height: 100vh;
+}
+
+.toolbar-tramites-ex {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 17px;
+}
+
+.toolbar-tramites-ex button {
+    background: #2d7ff9;
+    color: white;
+    border: none;
+    padding: 7px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tabla-tramites-externos {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.tabla-tramites-externos th,
+.tabla-tramites-externos td {
+    border: 1px solid #dbeafe;
+    padding: 8px 10px;
+    text-align: left;
+}
+
+.tabla-tramites-externos th {
+    background: #2d7ff9;
+    color: white;
+}
+
+.tabla-tramites-externos tr:nth-child(even) {
+    background: #f1f5fd;
+}
+
+.estado {
+    padding: 2px 10px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
+    text-transform: capitalize;
+}
+
+.estado.pendiente {
+    background: #bdbdbd;
+}
+
+.estado.atendido {
+    background: #388e3c;
+}
+
+.estado.denegado {
+    background: #d32f2f;
+}
+
+.estado.derivado {
+    background: #ffa726;
+}
+
+.estado.archivado {
+    background: #616161;
+}
+
+.btn-accion {
+    margin-right: 6px;
+    padding: 5px 8px;
+    border: none;
+    border-radius: 4px;
+    color: #2d7ff9;
+    background: #e3f0ff;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.btn-accion:active {
+    opacity: 0.6;
+}
+
+.success {
+    color: #388e3c;
+    margin: 10px 0;
+}
+
+.error {
+    color: #d32f2f;
+    margin: 10px 0;
+}
+
+.modal-bg,
+.modal-bg-pdf {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(30, 40, 60, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-tramite-detalle,
+.modal-pdf-viewer {
+    background: #fff;
+    padding: 34px 28px;
+    border-radius: 12px;
+    min-width: 320px;
+    max-width: 440px;
+    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.15);
+    font-size: 16px;
+    color: #1a237e;
+    position: relative;
+}
+
+.modal-pdf-viewer {
+    max-width: 780px;
+    width: 95vw;
+    min-width: 360px;
+    padding: 12px 12px 32px 12px;
+}
+
+.modal-tramite-detalle h3,
+.modal-pdf-viewer h3 {
+    margin-top: 0;
+    color: #2d7ff9;
+}
+
+.btn-modal {
+    margin: 8px 6px 0 0;
+    padding: 8px 17px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    font-size: 15px;
+    transition: background 0.1s;
+}
+
+.btn-modal.atender {
+    background: #388e3c;
+}
+
+.btn-modal.cerrar {
+    background: #bdbdbd;
+    color: #222;
+}
+
+.btn-adjuntar {
+    background: #ffa726;
+    color: #1a237e;
+    padding: 6px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.adjuntar-box {
+    margin-top: 8px;
+    margin-bottom: 6px;
+}
+
+.btn-cancelar-adjunto {
+    background: #ffe3e3;
+    color: #d32f2f;
+    border: none;
+    font-size: 14px;
+    margin-left: 6px;
+    padding: 0px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+textarea {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #bdbdbd;
+    font-size: 16px;
+    margin-top: 6px;
+    min-height: 60px;
+}
+
+.spiner-estado {
+    margin: 0 12px;
+    font-size: 15px;
+    padding: 3px 8px;
+}
