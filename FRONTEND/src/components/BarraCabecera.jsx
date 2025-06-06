@@ -55,7 +55,7 @@ export default function BarraCabecera() {
         navigate("/login", { replace: true });
     };
 
-    //Busca el label del rol:
+    //busca el label del rol:
     const rolLegible = usuario.rol
         ? (ROLES_OPTIONS.find(r => r.value === usuario.rol)?.label || usuario.rol)
         : "";
