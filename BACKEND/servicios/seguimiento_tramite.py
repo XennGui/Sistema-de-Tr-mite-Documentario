@@ -105,3 +105,35 @@ def eliminar_seguimiento_tramite(seguimiento_id):
     cur.close()
     conn.close()
     return result is not None
+
+def obtener_seguimiento_de_tramite_externo(tramite_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT 
+            s.id, s.fecha_hora, s.accion, s.descripcion, s.adjunto, 
+            COALESCE(u.nombre, '') as usuario, 
+            COALESCE(a.nombre, '') as area,
+            s.observaciones
+        FROM seguimiento_tramites s
+        LEFT JOIN usuarios u ON u.id = s.usuario_id
+        LEFT JOIN areas a ON a.id = s.area_id
+        WHERE s.tramite_id = %s AND s.tramite_type = 'externo'
+        ORDER BY s.fecha_hora ASC;
+    """, (tramite_id,))
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return [
+        {
+            "id": row[0],
+            "fecha_hora": row[1],
+            "accion": row[2],
+            "descripcion": row[3],
+            "adjunto": row[4],
+            "usuario": row[5],
+            "area": row[6],
+            "observaciones": row[7],
+        }
+        for row in rows
+    ]

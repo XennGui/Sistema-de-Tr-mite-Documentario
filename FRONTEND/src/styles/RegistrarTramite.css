@@ -1,0 +1,130 @@
+/* src/styles/RegistrarTramite.css */
+
+.registrar-tramite-contenedor-horizontal {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 30px 32px 32px 32px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 24px #0002;
+}
+
+.registrar-tramite-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 2em;
+    justify-content: center;
+}
+
+.registrar-tramite-icon {
+    font-size: 2.2em;
+    color: #2779bd;
+}
+
+.registrar-tramite-form-horizontal {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1.4em;
+    margin-bottom: 0.5em;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1 1 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.2em;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.form-icon {
+    color: #2779bd;
+    font-size: 1.1em;
+}
+
+.registrar-tramite-form-horizontal input,
+.registrar-tramite-form-horizontal select,
+.registrar-tramite-form-horizontal textarea {
+    width: 100%;
+    padding: 0.45em 0.7em;
+    border-radius: 5px;
+    border: 1px solid #aac;
+    font-size: 1em;
+    box-sizing: border-box;
+    outline: none;
+    transition: border .2s;
+    margin-bottom: 0.2em;
+}
+
+.registrar-tramite-form-horizontal input:focus,
+.registrar-tramite-form-horizontal textarea:focus,
+.registrar-tramite-form-horizontal select:focus {
+    border: 1.5px solid #2779bd;
+}
+
+.registrar-tramite-form-horizontal textarea {
+    resize: none;
+}
+
+.registrar-tramite-botones {
+    display: flex;
+    gap: 1em;
+    justify-content: flex-end;
+    margin-top: 1em;
+}
+
+.registrar-tramite-btn {
+    background: #2779bd;
+    color: #fff;
+    border: none;
+    padding: 0.6em 1.3em;
+    border-radius: 6px;
+    font-size: 1em;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0 1px 4px #2779bd22;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.registrar-tramite-btn:hover {
+    background: #155d8b;
+}
+
+.registrar-tramite-error {
+    background: #ffe5e5;
+    color: #b10000;
+    padding: 1em;
+    border-radius: 6px;
+    margin-bottom: 1em;
+    text-align: center;
+}
+
+.tramite-exito {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 2em;
+    background: #e6ffe6;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 24px #0002;
+}
+
+.tramite-exito button {
+    margin-top: 1.3em;
+    margin-right: 1em;
+}

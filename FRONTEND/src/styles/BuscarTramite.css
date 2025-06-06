@@ -1,0 +1,196 @@
+/* src/styles/BuscarTramite.css */
+
+.buscar-tramite-contenedor {
+    max-width: 900px;
+    margin: 36px auto;
+    padding-bottom: 40px;
+}
+
+.buscar-tramite-form-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 3px 16px #2779bd21;
+    padding: 2em 2.2em 2em 2.2em;
+    margin-bottom: 28px;
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.buscar-tramite-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+}
+
+.buscar-tramite-form label {
+    font-weight: 500;
+    margin-bottom: 0.2em;
+}
+
+.buscar-tramite-form input {
+    padding: 0.6em 0.7em;
+    border-radius: 7px;
+    border: 1.1px solid #aac;
+    font-size: 1em;
+    width: 100%;
+    outline: none;
+    transition: border .2s;
+}
+
+.buscar-tramite-form input:focus {
+    border: 1.5px solid #2779bd;
+}
+
+.buscar-tramite-btn {
+    background: #2779bd;
+    color: #fff;
+    border: none;
+    padding: 0.7em 1.6em;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    align-self: flex-end;
+    transition: background 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.buscar-tramite-btn:hover {
+    background: #155d8b;
+}
+
+.buscar-tramite-error {
+    background: #ffe5e5;
+    color: #b10000;
+    padding: 1em;
+    border-radius: 6px;
+    margin-top: 1em;
+    text-align: center;
+}
+
+.buscar-tramite-icon {
+    color: #2779bd;
+    font-size: 1.3em;
+    margin-right: 10px;
+}
+
+.tramite-info-card {
+    background: #f7f9fd;
+    border-radius: 13px;
+    box-shadow: 0 2px 12px #2779bd19;
+    padding: 2.2em;
+    margin-bottom: 32px;
+    margin-top: 32px;
+}
+
+.tramite-info-card h2 {
+    color: #2779bd;
+    font-size: 1.25em;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.3em;
+}
+
+.tramite-info-icon {
+    margin-right: 10px;
+    color: #155d8b;
+}
+
+.tramite-info-formulario {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1em 2.3em;
+}
+
+.tramite-info-formulario label {
+    font-weight: 500;
+    color: #34495e;
+    margin-right: .5em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ti-icon {
+    color: #2779bd;
+    font-size: 1.1em;
+}
+
+.seguimiento-card {
+    background: #fff;
+    border-radius: 13px;
+    box-shadow: 0 2px 12px #2779bd15;
+    padding: 2em 1.5em 2.5em 1.5em;
+    margin-top: 32px;
+}
+
+.seguimiento-card h2 {
+    color: #2779bd;
+    font-size: 1.12em;
+    margin-bottom: 1.1em;
+    display: flex;
+    align-items: center;
+}
+
+.seguimiento-icon {
+    margin-right: 8px;
+    color: #155d8b;
+}
+
+.seguimiento-table-wrapper {
+    overflow-x: auto;
+}
+
+.seguimiento-table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 650px;
+    background: #f8fafe;
+    border-radius: 9px;
+    overflow: hidden;
+}
+
+.seguimiento-table th,
+.seguimiento-table td {
+    padding: 0.65em 0.7em;
+    border-bottom: 1px solid #e0e4ee;
+    text-align: left;
+}
+
+.seguimiento-table thead th {
+    background: #2779bd;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1em;
+}
+
+.seguimiento-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.seguimiento-table tbody tr:hover {
+    background: #eaf2fb;
+}
+
+.seguimiento-table a {
+    color: #2779bd;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+@media (max-width: 700px) {
+    .tramite-info-formulario {
+        grid-template-columns: 1fr;
+        gap: 1em;
+    }
+    .tramite-info-card,
+    .seguimiento-card {
+        padding: 1em;
+    }
+    .buscar-tramite-form-card {
+        padding: 1em;
+    }
+}
