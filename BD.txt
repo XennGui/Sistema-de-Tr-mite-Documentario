@@ -21,7 +21,7 @@ CREATE TABLE usuarios (
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     rol VARCHAR(20) NOT NULL DEFAULT 'admin',
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fecha_creacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabla de trámites externos (optimizada)
@@ -41,8 +41,8 @@ CREATE TABLE tramites_externos (
     telefono VARCHAR(20),
     estado VARCHAR(20) DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'atendido', 'denegado', 'derivado', 'archivado')),
     prioridad INTEGER DEFAULT 3 CHECK (prioridad BETWEEN 1 AND 5),
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_vencimiento TIMESTAMP,
+    fecha_registro TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    fecha_vencimiento TIMESTAMPTZ,
     usuario_registro_id INTEGER REFERENCES usuarios(id),
     area_actual_id INTEGER REFERENCES areas(id)
 );
@@ -60,9 +60,9 @@ CREATE TABLE tramites_internos (
     area_destino_id INTEGER REFERENCES areas(id) NOT NULL,
     estado VARCHAR(20) DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'recibido', 'atendido', 'derivado', 'archivado')),
     prioridad INTEGER DEFAULT 3 CHECK (prioridad BETWEEN 1 AND 5),
-    fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_recepcion TIMESTAMP,
-    fecha_vencimiento TIMESTAMP
+    fecha_envio TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    fecha_recepcion TIMESTAMPTZ,
+    fecha_vencimiento TIMESTAMPTZ
 );
 
 -- Tabla unificada de seguimiento
@@ -76,7 +76,7 @@ CREATE TABLE seguimiento_tramites (
     area_id INTEGER REFERENCES areas(id),
     adjunto VARCHAR(255),
     observaciones TEXT,
-    fecha_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fecha_hora TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabla de derivaciones (simplificada, usa seguimiento para registro)
@@ -87,9 +87,9 @@ CREATE TABLE derivaciones (
     area_origen_id INTEGER REFERENCES areas(id) NOT NULL,
     area_destino_id INTEGER REFERENCES areas(id) NOT NULL,
     usuario_derivacion_id INTEGER REFERENCES usuarios(id) NOT NULL,
-    fecha_derivacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_derivacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     instrucciones TEXT,
-    fecha_limite TIMESTAMP
+    fecha_limite TIMESTAMPTZ
 );
 
 -- Tabla para documentos generados (unificada para ambos tipos)
@@ -101,7 +101,7 @@ CREATE TABLE documentos_generados (
     contenido TEXT NOT NULL,
     archivo VARCHAR(255) NOT NULL,
     usuario_generador_id INTEGER REFERENCES usuarios(id) NOT NULL,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_creacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     firmado BOOLEAN DEFAULT FALSE,
-    fecha_firma TIMESTAMP
+    fecha_firma TIMESTAMPTZ
 );
