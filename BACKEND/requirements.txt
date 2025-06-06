@@ -14,3 +14,5 @@ python-jose
 pydantic
 dateparser
 email-validator
+python-multipart
+pytz
