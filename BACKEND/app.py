@@ -9,7 +9,7 @@ from rutas.seguimiento_tramite import router as seguimiento_tramite_router
 from rutas.derivacion import router as derivacion_router
 from rutas.documento_generado import router as documento_generado_router    
 from pydantic import BaseModel
-from typing import Optional, List, Tuple
+from typing import Dict, Optional, List, Tuple
 from embeddings import create_embeddings, save_vectorstore, load_vectorstore, prepare_docs_from_db
 from db import fetch_all_data, get_connection
 from langchain.prompts import PromptTemplate
@@ -61,6 +61,8 @@ class QueryRequest(BaseModel):
     pregunta: str
     usar_bd: bool = False
     chat_history: Optional[List[Tuple[str, str]]] = None
+    usuario_id: Optional[int] = None
+    usuario: Optional[Dict] = None
 
 def quitar_tildes(texto: str) -> str:
     return ''.join(c for c in unicodedata.normalize('NFD', texto) if unicodedata.category(c) != 'Mn')
@@ -88,7 +90,6 @@ def reentrenar_embeddings():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error reentrenando embeddings: {e}")
 
-# Funciones para consultas SQL
 def obtener_total(tabla: str) -> int:
     conn = get_connection()
     cur = conn.cursor()
@@ -107,188 +108,114 @@ def consulta_sql(sql: str, params: tuple = ()):
     conn.close()
     return resultado
 
+def es_mesa_partes(usuario):
+    """Devuelve True si el usuario es mesa de partes o admin"""
+    return usuario.get("rol") in ["admin", "mesa_partes"]
+
 @app.post("/chat")
 def chat(req: QueryRequest):
     try:
         pregunta = req.pregunta.strip()
         if not pregunta:
             raise HTTPException(status_code=400, detail="La pregunta no puede estar vacía.")
-
         pregunta_lower = quitar_tildes(pregunta.lower())
+        usuario_id = req.usuario_id
+        usuario = req.usuario or {}
+        area_id = usuario.get("area_id")
 
-        # CONSULTAS MUNICIPALES
-        if req.usar_bd and (
-            "cuantos usuarios" in pregunta_lower or
-            "total de usuarios" in pregunta_lower or
-            "cantidad de usuarios" in pregunta_lower
-        ):
-            total = obtener_total("usuarios")
-            respuesta = f"En total tienes {total} usuarios registrados."
-            return {"respuesta": respuesta, "chat_history": req.chat_history or []}
+        # --- DATOS PERSONALES ---
+        if "mi nombre" in pregunta_lower:
+            nombre = usuario.get("nombre", "No se pudo obtener tu nombre.")
+            return {"respuesta": f"Tu nombre es: {nombre}", "chat_history": req.chat_history or []}
+        if "mi area" in pregunta_lower or "mi área" in pregunta_lower:
+            from servicios.area import obtener_area
+            area = obtener_area(area_id) if area_id else None
+            area_nombre = area["nombre"] if area else "No se encontró tu área."
+            return {"respuesta": f"Tu área es: {area_nombre}", "chat_history": req.chat_history or []}
+        if "mi rol" in pregunta_lower:
+            return {"respuesta": f"Tu rol es: {usuario.get('rol', 'No disponible')}", "chat_history": req.chat_history or []}
+        if "mi correo" in pregunta_lower or "mi email" in pregunta_lower:
+            return {"respuesta": f"Tu correo es: {usuario.get('email', 'No disponible')}", "chat_history": req.chat_history or []}
 
-        if req.usar_bd and (
-            "cuantos tramites externos" in pregunta_lower or
-            "total de tramites externos" in pregunta_lower or
-            "cantidad de tramites externos" in pregunta_lower
-        ):
-            total = obtener_total("tramites_externos")
-            respuesta = f"En total tienes {total} trámites externos registrados."
-            return {"respuesta": respuesta, "chat_history": req.chat_history or []}
-
-        if req.usar_bd and (
-            "cuantos tramites internos" in pregunta_lower or
-            "total de tramites internos" in pregunta_lower or
-            "cantidad de tramites internos" in pregunta_lower
-        ):
-            total = obtener_total("tramites_internos")
-            respuesta = f"En total tienes {total} trámites internos registrados."
-            return {"respuesta": respuesta, "chat_history": req.chat_history or []}
-
-        if req.usar_bd and (
-            "cuantos areas" in pregunta_lower or
-            "total de areas" in pregunta_lower or
-            "cantidad de areas" in pregunta_lower
-        ):
-            total = obtener_total("areas")
-            respuesta = f"En total tienes {total} áreas registradas."
-            return {"respuesta": respuesta, "chat_history": req.chat_history or []}
-
-        if req.usar_bd and (
-            "cuantos documentos generados" in pregunta_lower or
-            "total de documentos generados" in pregunta_lower or
-            "cantidad de documentos generados" in pregunta_lower
-        ):
-            total = obtener_total("documentos_generados")
-            respuesta = f"En total tienes {total} documentos generados en el sistema."
-            return {"respuesta": respuesta, "chat_history": req.chat_history or []}
-
-        # Consultar trámites pendientes
-        if req.usar_bd and (
-            "tramites pendientes" in pregunta_lower
-        ):
-            sql = "SELECT COUNT(*) FROM tramites_externos WHERE estado = 'pendiente';"
-            resultado = consulta_sql(sql)
-            total = resultado[0][0] if resultado else 0
-            respuesta = f"Hay {total} trámites externos pendientes."
-            return {"respuesta": respuesta, "chat_history": req.chat_history or []}
-
-        # Consultar trámites por área
-        if req.usar_bd and (
-            "tramites por area" in pregunta_lower or "trámites por área" in pregunta_lower
-        ):
-            sql = """
-                SELECT a.nombre, COUNT(te.id)
-                FROM tramites_externos te
-                LEFT JOIN areas a ON te.area_actual_id = a.id
-                GROUP BY a.nombre
-                ORDER BY COUNT(te.id) DESC;
-            """
-            resultado = consulta_sql(sql)
-            if resultado:
-                respuesta = "Trámites externos por área:\n"
-                for area, cantidad in resultado:
-                    respuesta += f"- {area}: {cantidad}\n"
-            else:
-                respuesta = "No se encontraron trámites registrados por área."
-            return {"respuesta": respuesta, "chat_history": req.chat_history or []}
-
-        # Consultar seguimiento de un trámite externo por número de expediente
-        if req.usar_bd and (
-            "seguimiento del tramite" in pregunta_lower or "seguimiento del trámite" in pregunta_lower
-        ):
-            # Busca el número de expediente en la pregunta (asume formato: SEGUIMIENTO DEL TRAMITE 2024-001)
-            match = re.search(r"tramite[s]?\s+([a-zA-Z0-9\-]+)", pregunta_lower)
-            if match:
-                num_expediente = match.group(1)
-                sql = """
-                    SELECT st.accion, st.descripcion, st.fecha_hora, u.nombre as usuario, a.nombre as area
-                    FROM seguimiento_tramites st
-                    LEFT JOIN usuarios u ON st.usuario_id = u.id
-                    LEFT JOIN areas a ON st.area_id = a.id
-                    LEFT JOIN tramites_externos te ON st.tramite_id = te.id
-                    WHERE st.tramite_type = 'externo' AND te.numero_expediente = %s
-                    ORDER BY st.fecha_hora ASC;
-                """
-                resultado = consulta_sql(sql, (num_expediente,))
-                if resultado:
-                    respuesta = f"Seguimiento del trámite externo {num_expediente}:\n"
-                    for accion, descripcion, fecha, usuario, area in resultado:
-                        respuesta += f"- [{fecha}] {accion} por {usuario} en {area}. Detalle: {descripcion}\n"
-                else:
-                    respuesta = f"No se encontró seguimiento para el trámite externo {num_expediente}."
-            else:
-                respuesta = "No se encontró el número de expediente en la pregunta."
-            return {"respuesta": respuesta, "chat_history": req.chat_history or []}
-
-        # Consultar trámites atendidos en un rango de fechas
-        if req.usar_bd and (
-            "tramites atendidos" in pregunta_lower and ("entre" in pregunta_lower or "desde" in pregunta_lower)
-        ):
-            fechas = re.findall(r"\d{4}-\d{2}-\d{2}", pregunta)
-            if len(fechas) >= 2:
-                fecha_ini, fecha_fin = fechas[0], fechas[1]
-                sql = """
-                    SELECT COUNT(*) FROM tramites_externos
-                    WHERE estado = 'atendido' AND fecha_registro >= %s AND fecha_registro <= %s;
-                """
-                resultado = consulta_sql(sql, (fecha_ini, fecha_fin))
+        # --- CONSULTAS GLOBALES/ADMIN/MESA DE PARTES ---
+        if req.usar_bd and es_mesa_partes(usuario):
+            # Usuarios/áreas solo para admin y mesa de partes
+            if "cuantos usuarios" in pregunta_lower or "total de usuarios" in pregunta_lower:
+                sql = "SELECT COUNT(*) FROM usuarios;"
+                resultado = consulta_sql(sql)
                 total = resultado[0][0] if resultado else 0
-                respuesta = f"Se han atendido {total} trámites externos entre {fecha_ini} y {fecha_fin}."
-            else:
-                respuesta = "No se encontraron dos fechas válidas en la pregunta."
-            return {"respuesta": respuesta, "chat_history": req.chat_history or []}
-
-        # Consultar trámites de un remitente (por DNI/RUC)
-        if req.usar_bd and (
-            ("tramites de" in pregunta_lower or "trámites de" in pregunta_lower) and ("dni" in pregunta_lower or "ruc" in pregunta_lower)
-        ):
-            match = re.search(r"(dni|ruc)\s*:?[\s\-]?([0-9]+)", pregunta_lower)
-            if match:
-                dni_ruc = match.group(2)
-                sql = """
-                    SELECT numero_expediente, asunto, estado, fecha_registro
-                    FROM tramites_externos
-                    WHERE dni_ruc = %s
-                    ORDER BY fecha_registro DESC;
-                """
-                resultado = consulta_sql(sql, (dni_ruc,))
+                return {"respuesta": f"El total de usuarios registrados es {total}.", "chat_history": req.chat_history or []}
+            if "cuantos areas" in pregunta_lower or "total de areas" in pregunta_lower:
+                sql = "SELECT COUNT(*) FROM areas;"
+                resultado = consulta_sql(sql)
+                total = resultado[0][0] if resultado else 0
+                return {"respuesta": f"El total de áreas registradas es {total}.", "chat_history": req.chat_history or []}
+            if "usuarios en el sistema" in pregunta_lower or "lista de usuarios" in pregunta_lower:
+                sql = "SELECT nombre, username, rol FROM usuarios;"
+                resultado = consulta_sql(sql)
                 if resultado:
-                    respuesta = f"Trámites del remitente con {match.group(1).upper()} {dni_ruc}:\n"
-                    for exp, asunto, estado, fecha in resultado:
-                        respuesta += f"- [{fecha}] Expediente: {exp} | Estado: {estado} | Asunto: {asunto}\n"
-                else:
-                    respuesta = f"No se hallaron trámites para el {match.group(1).upper()} {dni_ruc}."
-            else:
-                respuesta = "No se encontró un DNI o RUC válido en la pregunta."
-            return {"respuesta": respuesta, "chat_history": req.chat_history or []}
+                    lista = "\n".join([f"- {n} ({u}), rol: {r}" for n, u, r in resultado])
+                    return {"respuesta": f"Usuarios registrados:\n{lista}", "chat_history": req.chat_history or []}
+                return {"respuesta": "No hay usuarios registrados.", "chat_history": req.chat_history or []}
+            # Mesa de partes puede ver TODOS los trámites internos y externos:
+            if "tramites internos" in pregunta_lower:
+                sql = "SELECT COUNT(*) FROM tramites_internos;"
+                resultado = consulta_sql(sql)
+                total = resultado[0][0] if resultado else 0
+                return {"respuesta": f"En total hay {total} trámites internos registrados.", "chat_history": req.chat_history or []}
+            if "tramites externos" in pregunta_lower:
+                sql = "SELECT COUNT(*) FROM tramites_externos;"
+                resultado = consulta_sql(sql)
+                total = resultado[0][0] if resultado else 0
+                return {"respuesta": f"En total hay {total} trámites externos registrados.", "chat_history": req.chat_history or []}
 
-        # Consultar documentos generados por usuario
+        # --- CONSULTAS RESTRINGIDAS a su área para otros roles ---
+        if req.usar_bd and not es_mesa_partes(usuario):
+            # Trámites internos en su área (como jefe, auxiliar, etc.)
+            if "tramites internos" in pregunta_lower:
+                sql = "SELECT COUNT(*) FROM tramites_internos WHERE area_destino_id = %s;"
+                resultado = consulta_sql(sql, (area_id,))
+                total = resultado[0][0] if resultado else 0
+                return {"respuesta": f"En tu área hay {total} trámites internos derivados a tu área.", "chat_history": req.chat_history or []}
+            if "tramites externos" in pregunta_lower:
+                sql = "SELECT COUNT(*) FROM tramites_externos WHERE area_actual_id = %s;"
+                resultado = consulta_sql(sql, (area_id,))
+                total = resultado[0][0] if resultado else 0
+                return {"respuesta": f"En tu área hay {total} trámites externos actualmente.", "chat_history": req.chat_history or []}
+            # No puede ver usuarios ni áreas, responde acceso denegado
+            if "usuarios" in pregunta_lower or "areas" in pregunta_lower:
+                return {"respuesta": "No tienes autorización para consultar usuarios o áreas. Solo mesa de partes o admin puede hacerlo.", "chat_history": req.chat_history or []}
+
+        # --- CONSULTAS SIEMPRE PERSONALES (para todos los roles) ---
         if req.usar_bd and (
-            ("documentos generados por usuario" in pregunta_lower or "documentos firmados por usuario" in pregunta_lower)
+            "mis tramites internos" in pregunta_lower or "mis trámites internos" in pregunta_lower
         ):
-            match = re.search(r"usuario[s]?\s+([a-zA-ZáéíóúÁÉÍÓÚ0-9\s\-]+)", pregunta_lower)
-            if match:
-                usuario_nombre = match.group(1).strip()
-                sql = """
-                    SELECT dg.tipo_documento, dg.fecha_creacion, dg.firmado
-                    FROM documentos_generados dg
-                    JOIN usuarios u ON dg.usuario_generador_id = u.id
-                    WHERE LOWER(u.nombre) LIKE %s
-                    ORDER BY dg.fecha_creacion DESC;
-                """
-                resultado = consulta_sql(sql, (f"%{usuario_nombre.lower()}%",))
-                if resultado:
-                    respuesta = f"Documentos generados por {usuario_nombre}:\n"
-                    for tipo, fecha, firmado in resultado:
-                        firmado_txt = "Sí" if firmado else "No"
-                        respuesta += f"- [{fecha}] Tipo: {tipo} | Firmado: {firmado_txt}\n"
-                else:
-                    respuesta = f"No se hallaron documentos generados por {usuario_nombre}."
-            else:
-                respuesta = "No se encontró el nombre del usuario en la pregunta."
-            return {"respuesta": respuesta, "chat_history": req.chat_history or []}
+            if not usuario_id:
+                return {"respuesta": "No se pudo identificar el usuario actual."}
+            sql = "SELECT COUNT(*) FROM tramites_internos WHERE remitente_id = %s;"
+            resultado = consulta_sql(sql, (usuario_id,))
+            total = resultado[0][0] if resultado else 0
+            return {"respuesta": f"Tienes {total} trámites internos registrados.", "chat_history": req.chat_history or []}
+        if req.usar_bd and (
+            "mis tramites externos" in pregunta_lower or "mis trámites externos" in pregunta_lower
+        ):
+            if not usuario_id:
+                return {"respuesta": "No se pudo identificar el usuario actual."}
+            sql = "SELECT COUNT(*) FROM tramites_externos WHERE usuario_registro_id = %s;"
+            resultado = consulta_sql(sql, (usuario_id,))
+            total = resultado[0][0] if resultado else 0
+            return {"respuesta": f"Tienes {total} trámites externos registrados.", "chat_history": req.chat_history or []}
+        if req.usar_bd and (
+            "mis documentos generados" in pregunta_lower or "que documentos he generado" in pregunta_lower
+        ):
+            if not usuario_id:
+                return {"respuesta": "No se pudo identificar el usuario actual."}
+            sql = "SELECT COUNT(*) FROM documentos_generados WHERE usuario_generador_id = %s;"
+            resultado = consulta_sql(sql, (usuario_id,))
+            total = resultado[0][0] if resultado else 0
+            return {"respuesta": f"Has generado {total} documentos.", "chat_history": req.chat_history or []}
 
-        # Si no es una consulta directa a BD, usa el LLM (con o sin recuperación semántica)
+        # --- DEFAULT: LLM / QA semántico ---
         if not req.usar_bd:
             respuesta = llm_chain.run({"context": "", "question": pregunta})
         else:
@@ -301,7 +228,9 @@ def chat(req: QueryRequest):
         chat_hist = req.chat_history or []
         chat_hist.append((pregunta, respuesta))
         return {"respuesta": respuesta, "chat_history": chat_hist}
+
     except Exception as e:
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+    

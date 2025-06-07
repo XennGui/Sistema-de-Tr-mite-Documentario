@@ -15,7 +15,7 @@ export default function ChatbotMunicipal({ placement = "center" }) {
 
     const chatEndRef = useRef(null);
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
-    // 1. Obtén el usuario logueado del localStorage
+
     const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
 
     useEffect(() => {
@@ -45,7 +45,6 @@ export default function ChatbotMunicipal({ placement = "center" }) {
         setTimeout(() => setMsgBot(""), 2500);
     };
 
-    // 2. Envía usuario_id en cada petición al backend
     const enviarPregunta = async (e) => {
         e.preventDefault();
         if (!pregunta.trim()) return;
@@ -60,7 +59,8 @@ export default function ChatbotMunicipal({ placement = "center" }) {
                     pregunta,
                     usar_bd: usarBD,
                     chat_history: chat.map(m => [m.pregunta, m.respuesta]),
-                    usuario_id: usuario?.id || null, // <-- ENVÍA EL ID DEL USUARIO LOGUEADO
+                    usuario_id: usuario?.id || null,
+                    usuario: usuario || null, // <-- ENVÍA TODO EL USUARIO
                 }),
             });
             const data = await res.json();
@@ -82,7 +82,7 @@ export default function ChatbotMunicipal({ placement = "center" }) {
         setLoading(false);
     };
 
-    // Posicionamiento: centro o flotante (bottom right)
+
     const placementStyle = placement === "center"
         ? { position: "fixed", left: "50%", top: "10vh", transform: "translateX(-50%)", zIndex: 2001 }
         : { position: "fixed", right: "32px", bottom: "100px", zIndex: 2001 };
