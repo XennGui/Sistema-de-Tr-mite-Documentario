@@ -112,6 +112,52 @@ def es_mesa_partes(usuario):
     """Devuelve True si el usuario es mesa de partes o admin"""
     return usuario.get("rol") in ["admin", "mesa_partes"]
 
+def contar_estados_tramites(tipo_tramite, area_id=None, usuario_id=None, estado=None):
+    """
+    Cuenta trámites según tipo, área, usuario y estado.
+    tipo_tramite: 'interno' o 'externo'
+    """
+    try:
+        if tipo_tramite not in ["interno", "externo"]:
+            return 0
+            
+        tabla = "tramites_internos" if tipo_tramite == "interno" else "tramites_externos"
+        condiciones = []
+        parametros = []
+        
+        # Filtro por área
+        if area_id:
+            if tipo_tramite == "interno":
+                condiciones.append("area_destino_id = %s")
+            else:  # externo
+                condiciones.append("area_actual_id = %s")
+            parametros.append(area_id)
+        
+        # Filtro por usuario
+        if usuario_id:
+            if tipo_tramite == "interno":
+                condiciones.append("remitente_id = %s")
+            else:  # externo
+                condiciones.append("usuario_registro_id = %s")
+            parametros.append(usuario_id)
+        
+        # Filtro por estado específico
+        if estado:
+            condiciones.append("estado = %s")
+            parametros.append(estado)
+        
+        # Construir la consulta SQL
+        sql = f"SELECT COUNT(*) FROM {tabla}"
+        if condiciones:
+            sql += " WHERE " + " AND ".join(condiciones)
+        
+        resultado = consulta_sql(sql, tuple(parametros)) if parametros else consulta_sql(sql)
+        return resultado[0][0] if resultado else 0
+        
+    except Exception as e:
+        print(f"Error al contar estados: {str(e)}")
+        return 0
+
 @app.post("/chat")
 def chat(req: QueryRequest):
     try:
@@ -122,6 +168,7 @@ def chat(req: QueryRequest):
         usuario_id = req.usuario_id
         usuario = req.usuario or {}
         area_id = usuario.get("area_id")
+        rol = usuario.get("rol", "").lower()
 
         # --- DATOS PERSONALES ---
         if "mi nombre" in pregunta_lower:
@@ -136,6 +183,60 @@ def chat(req: QueryRequest):
             return {"respuesta": f"Tu rol es: {usuario.get('rol', 'No disponible')}", "chat_history": req.chat_history or []}
         if "mi correo" in pregunta_lower or "mi email" in pregunta_lower:
             return {"respuesta": f"Tu correo es: {usuario.get('email', 'No disponible')}", "chat_history": req.chat_history or []}
+
+        # --- CONSULTAS DE ESTADOS DE TRÁMITES ---
+        if req.usar_bd:
+            # Consultas para trámites internos
+            if any(palabra in pregunta_lower for palabra in ["estado", "estados"]) and "interno" in pregunta_lower:
+                if es_mesa_partes(usuario):
+                    # Mesa de partes ve todos los estados
+                    estados = ['pendiente', 'recibido', 'atendido', 'derivado', 'archivado']
+                    conteos = {estado: contar_estados_tramites("interno", estado=estado) for estado in estados}
+                    respuesta = "Estados de trámites internos en todo el sistema:\n" + "\n".join(
+                        [f"- {estado.capitalize()}: {conteos[estado]}" for estado in estados])
+                else:
+                    # Usuario normal ve solo los de su área
+                    estados = ['pendiente', 'recibido', 'atendido', 'derivado', 'archivado']
+                    conteos = {estado: contar_estados_tramites("interno", area_id=area_id, estado=estado) for estado in estados}
+                    respuesta = f"Estados de trámites internos en tu área:\n" + "\n".join(
+                        [f"- {estado.capitalize()}: {conteos[estado]}" for estado in estados])
+                return {"respuesta": respuesta, "chat_history": req.chat_history or []}
+
+            # Consultas para trámites externos
+            if any(palabra in pregunta_lower for palabra in ["estado", "estados"]) and "externo" in pregunta_lower:
+                if es_mesa_partes(usuario):
+                    # Mesa de partes ve todos los estados
+                    estados = ['pendiente', 'atendido', 'denegado', 'derivado', 'archivado']
+                    conteos = {estado: contar_estados_tramites("externo", estado=estado) for estado in estados}
+                    respuesta = "Estados de trámites externos en todo el sistema:\n" + "\n".join(
+                        [f"- {estado.capitalize()}: {conteos[estado]}" for estado in estados])
+                else:
+                    # Usuario normal ve solo los de su área
+                    estados = ['pendiente', 'atendido', 'denegado', 'derivado', 'archivado']
+                    conteos = {estado: contar_estados_tramites("externo", area_id=area_id, estado=estado) for estado in estados}
+                    respuesta = f"Estados de trámites externos en tu área:\n" + "\n".join(
+                        [f"- {estado.capitalize()}: {conteos[estado]}" for estado in estados])
+                return {"respuesta": respuesta, "chat_history": req.chat_history or []}
+
+            # Consultas específicas por estado
+            for estado in ['pendiente', 'recibido', 'atendido', 'denegado', 'derivado', 'archivado']:
+                if estado in pregunta_lower:
+                    if "interno" in pregunta_lower:
+                        if es_mesa_partes(usuario):
+                            total = contar_estados_tramites("interno", estado=estado)
+                            respuesta = f"Hay {total} trámites internos en estado '{estado}' en todo el sistema."
+                        else:
+                            total = contar_estados_tramites("interno", area_id=area_id, estado=estado)
+                            respuesta = f"Hay {total} trámites internos en estado '{estado}' en tu área."
+                        return {"respuesta": respuesta, "chat_history": req.chat_history or []}
+                    elif "externo" in pregunta_lower:
+                        if es_mesa_partes(usuario):
+                            total = contar_estados_tramites("externo", estado=estado)
+                            respuesta = f"Hay {total} trámites externos en estado '{estado}' en todo el sistema."
+                        else:
+                            total = contar_estados_tramites("externo", area_id=area_id, estado=estado)
+                            respuesta = f"Hay {total} trámites externos en estado '{estado}' en tu área."
+                        return {"respuesta": respuesta, "chat_history": req.chat_history or []}
 
         # --- CONSULTAS GLOBALES/ADMIN/MESA DE PARTES ---
         if req.usar_bd and es_mesa_partes(usuario):
@@ -158,12 +259,12 @@ def chat(req: QueryRequest):
                     return {"respuesta": f"Usuarios registrados:\n{lista}", "chat_history": req.chat_history or []}
                 return {"respuesta": "No hay usuarios registrados.", "chat_history": req.chat_history or []}
             # Mesa de partes puede ver TODOS los trámites internos y externos:
-            if "tramites internos" in pregunta_lower:
+            if "tramites internos" in pregunta_lower and not any(palabra in pregunta_lower for palabra in ["estado", "estados"]):
                 sql = "SELECT COUNT(*) FROM tramites_internos;"
                 resultado = consulta_sql(sql)
                 total = resultado[0][0] if resultado else 0
                 return {"respuesta": f"En total hay {total} trámites internos registrados.", "chat_history": req.chat_history or []}
-            if "tramites externos" in pregunta_lower:
+            if "tramites externos" in pregunta_lower and not any(palabra in pregunta_lower for palabra in ["estado", "estados"]):
                 sql = "SELECT COUNT(*) FROM tramites_externos;"
                 resultado = consulta_sql(sql)
                 total = resultado[0][0] if resultado else 0
@@ -172,12 +273,12 @@ def chat(req: QueryRequest):
         # --- CONSULTAS RESTRINGIDAS a su área para otros roles ---
         if req.usar_bd and not es_mesa_partes(usuario):
             # Trámites internos en su área (como jefe, auxiliar, etc.)
-            if "tramites internos" in pregunta_lower:
+            if "tramites internos" in pregunta_lower and not any(palabra in pregunta_lower for palabra in ["estado", "estados"]):
                 sql = "SELECT COUNT(*) FROM tramites_internos WHERE area_destino_id = %s;"
                 resultado = consulta_sql(sql, (area_id,))
                 total = resultado[0][0] if resultado else 0
                 return {"respuesta": f"En tu área hay {total} trámites internos derivados a tu área.", "chat_history": req.chat_history or []}
-            if "tramites externos" in pregunta_lower:
+            if "tramites externos" in pregunta_lower and not any(palabra in pregunta_lower for palabra in ["estado", "estados"]):
                 sql = "SELECT COUNT(*) FROM tramites_externos WHERE area_actual_id = %s;"
                 resultado = consulta_sql(sql, (area_id,))
                 total = resultado[0][0] if resultado else 0
@@ -189,7 +290,7 @@ def chat(req: QueryRequest):
         # --- CONSULTAS SIEMPRE PERSONALES (para todos los roles) ---
         if req.usar_bd and (
             "mis tramites internos" in pregunta_lower or "mis trámites internos" in pregunta_lower
-        ):
+        ) and not any(palabra in pregunta_lower for palabra in ["estado", "estados"]):
             if not usuario_id:
                 return {"respuesta": "No se pudo identificar el usuario actual."}
             sql = "SELECT COUNT(*) FROM tramites_internos WHERE remitente_id = %s;"
@@ -198,7 +299,7 @@ def chat(req: QueryRequest):
             return {"respuesta": f"Tienes {total} trámites internos registrados.", "chat_history": req.chat_history or []}
         if req.usar_bd and (
             "mis tramites externos" in pregunta_lower or "mis trámites externos" in pregunta_lower
-        ):
+        ) and not any(palabra in pregunta_lower for palabra in ["estado", "estados"]):
             if not usuario_id:
                 return {"respuesta": "No se pudo identificar el usuario actual."}
             sql = "SELECT COUNT(*) FROM tramites_externos WHERE usuario_registro_id = %s;"
