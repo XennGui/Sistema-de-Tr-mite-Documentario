@@ -12,10 +12,11 @@ export default function ChatbotMunicipal({ placement = "center" }) {
     const [usarBD, setUsarBD] = useState(false);
     const [msgBot, setMsgBot] = useState("");
     const [entrenando, setEntrenando] = useState(false);
+    const [pdfIdActual, setPdfIdActual] = useState(null);
 
     const chatEndRef = useRef(null);
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
-
+    
     const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
 
     useEffect(() => {
@@ -60,7 +61,8 @@ export default function ChatbotMunicipal({ placement = "center" }) {
                     usar_bd: usarBD,
                     chat_history: chat.map(m => [m.pregunta, m.respuesta]),
                     usuario_id: usuario?.id || null,
-                    usuario: usuario || null, // <-- ENVÍA TODO EL USUARIO
+                    usuario: usuario || null,
+                    pdf_id: pdfIdActual || null
                 }),
             });
             const data = await res.json();
@@ -87,7 +89,7 @@ export default function ChatbotMunicipal({ placement = "center" }) {
         ? { position: "fixed", left: "50%", top: "10vh", transform: "translateX(-50%)", zIndex: 2001 }
         : { position: "fixed", right: "32px", bottom: "100px", zIndex: 2001 };
 
-    // ... el resto de tu componente JSX (render) ...
+
     return (
         <>
             <button
@@ -137,18 +139,47 @@ export default function ChatbotMunicipal({ placement = "center" }) {
                             )}
                             <div ref={chatEndRef}></div>
                         </div>
-                        <form className="chatbot-modal-form" onSubmit={enviarPregunta}>
+                        {/* Barra inferior alineada */}
+                        <div className="chatbot-modal-bottombar">
+                            <label htmlFor="pdf-upload" className="pdf-clip-btn">📎</label>
                             <input
-                                value={pregunta}
-                                onChange={e => setPregunta(e.target.value)}
-                                placeholder={usarBD ? "Consulta estructurada a BD..." : "Escribe tu consulta a la IA..."}
-                                disabled={loading || entrenando}
-                                autoFocus
+                                id="pdf-upload"
+                                type="file"
+                                accept="application/pdf"
+                                style={{ display: "none" }}
+                                onChange={async e => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    const formData = new FormData();
+                                    formData.append("file", file);
+                                    const res = await fetch(`${apiUrl}/pdf-chat/upload`, { method: "POST", body: formData });
+                                    const data = await res.json();
+                                    setChat(prev => [
+                                        ...prev,
+                                        {
+                                            pregunta: "",
+                                            respuesta: `<b>Archivo subido:</b> ${file.name}`,
+                                            pdf_id: data.pdf_id,
+                                            pdf_filename: file.name
+                                        }
+                                    ]);
+                                    setPdfIdActual(data.pdf_id);
+                                }}
                             />
-                            <button type="submit" disabled={loading || !pregunta.trim() || entrenando}>
-                                <FaPaperPlane />
-                            </button>
-                        </form>
+                            <form className="chatbot-modal-form" onSubmit={enviarPregunta}>
+                                <input
+                                    id="chatbot-input"
+                                    value={pregunta}
+                                    onChange={e => setPregunta(e.target.value)}
+                                    placeholder={usarBD ? "Consulta estructurada a BD..." : "Escribe tu consulta a la IA..."}
+                                    disabled={loading || entrenando}
+                                    autoFocus
+                                />
+                                <button type="submit" disabled={loading || !pregunta.trim() || entrenando}>
+                                    <FaPaperPlane />
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}

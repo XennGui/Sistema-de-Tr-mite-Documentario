@@ -228,3 +228,110 @@
     border-radius: 5px;
     margin-bottom: 7px;
 }
+
+.chatbot-modal-bottombar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px 13px 15px;
+    background: #f8fafd;
+    border-top: 1px solid #e5eefe;
+}
+
+/* Clip azul redondo */
+.pdf-clip-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: #1976d2;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    margin-right: 0;
+    transition: background 0.15s, color 0.15s, box-shadow 0.12s;
+    box-shadow: 0 1px 6px #1a2e4e22;
+    border: none;
+    outline: none;
+}
+
+.pdf-clip-btn:hover {
+    background: #135095;
+    color: #fff;
+}
+
+/* Label ancho y pegado al clip */
+.chatbot-input-label {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    color: #1a3578;
+    white-space: nowrap;
+    min-width: 170px;
+    max-width: 260px;
+    width: 170px;
+    text-align: left;
+    padding-left: 6px;
+    padding-right: 9px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chatbot-modal-bottombar .chatbot-modal-form {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: none;
+    padding: 0;
+    background: transparent;
+}
+
+.chatbot-modal-bottombar .chatbot-modal-form input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #b3c3e1;
+    font-size: 15px;
+    outline: none;
+    min-width: 0;
+}
+
+.chatbot-modal-bottombar .chatbot-modal-form button {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 19px;
+    padding: 0 13px;
+    cursor: pointer;
+    transition: background 0.13s;
+    font-weight: bold;
+    margin-left: 2px;
+    min-width: 38px;
+}
+
+.chatbot-modal-bottombar .chatbot-modal-form button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Responsive para pantallas angostas */
+@media (max-width: 540px) {
+    .chatbot-modal-bottombar {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 8px 6px 11px 6px;
+    }
+    .chatbot-input-label {
+        font-size: 13px;
+        width: 100px;
+        min-width: 90px;
+        padding-left: 3px;
+        padding-right: 4px;
+    }
+}
