@@ -50,7 +50,6 @@ def pregunta_es_sobre_pdf(pregunta):
     ]
     return any(clave in pregunta for clave in claves_pdf)
 
-
 def obtener_metadatos_pdf(pdf_id):
     from servicios.area import obtener_area_por_id
 
@@ -59,11 +58,9 @@ def obtener_metadatos_pdf(pdf_id):
     if tramite:
         from servicios.usuario import obtener_usuario_por_id
         usuario = obtener_usuario_por_id(tramite["remitente_id"])
-        print("usuario remitente:", usuario)  # <-- agrega esto para debug
         nombre_remitente = usuario["nombre"] if usuario else "Desconocido"
         tramite["tipo_origen"] = "interno"
         tramite["nombre_remitente"] = nombre_remitente
-        # Aquí el área del usuario remitente, no del trámite
         area_id = usuario["area_id"] if usuario and "area_id" in usuario else None
         nombre_area = None
         if area_id:
@@ -71,15 +68,6 @@ def obtener_metadatos_pdf(pdf_id):
             nombre_area = area["nombre"] if area else "Desconocida"
         tramite["nombre_area"] = nombre_area
         return tramite
-
-    # Ahora busca en externos
-    tramite = obtener_tramite_externo(pdf_id)
-    if tramite:
-        tramite["tipo_origen"] = "externo"
-        tramite["nombre_remitente"] = tramite.get("remitente")
-        return tramite
-
-    return {}
 
     # Ahora busca en externos
     tramite = obtener_tramite_externo(pdf_id)
@@ -289,7 +277,7 @@ def chat(req: QueryRequest):
                 return {"respuesta": respuesta, "chat_history": req.chat_history or []}
 
             # --- FIN BLOQUE AGREGADO ---
-
+            
             # Prompt personalizado para resumen o tema
             if "de que trata" in pregunta_lower or "de qué trata" in pregunta_lower or "resumen" in pregunta_lower:
                 prompt_resumen = (
