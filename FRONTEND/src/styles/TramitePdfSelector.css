@@ -1,0 +1,43 @@
+/*src/styles/TramitePdfSelector.css*/
+
+.tramite-selector-modal-bg {
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(30,40,60,0.17);
+    z-index: 4000;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.tramite-selector-modal {
+    background: #fff;
+    border-radius: 10px;
+    max-width: 95vw;
+    min-width: 340px;
+    max-height: 90vh;
+    padding: 28px 26px 20px 26px;
+    box-shadow: 0 3px 40px #1a2e4e33;
+    position: relative;
+    overflow-y: auto;
+}
+.tramite-selector-close {
+    position: absolute; right: 8px; top: 8px;
+    border: none; background: none; cursor: pointer; font-size: 18px;
+}
+.tramite-selector-modal h3 { margin-top: 0; }
+.tramite-selector-modal button.selected {
+    background: #1976d2; color: #fff;
+}
+.tramite-selector-modal button {
+    padding: 7px 18px; border-radius: 5px; border: 1px solid #1976d2; background: #f7fafd; color: #1976d2; font-weight: 500; cursor: pointer;
+}
+.tramite-list { list-style: none; margin: 0; padding: 0; }
+.tramite-pdf-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; text-align: left;
+    background: #f0f6ff; border: 1px solid #b3c3e1; border-radius: 6px;
+    padding: 9px 15px; margin-bottom: 7px; cursor: pointer; color: #1a3578; font-size: 15px;
+    transition: background 0.13s;
+}
+.tramite-pdf-btn:hover {
+    background: #1976d2; color: #fff;
+}
