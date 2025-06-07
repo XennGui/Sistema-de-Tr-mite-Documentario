@@ -32,6 +32,19 @@ def obtener_area(area_id):
         return {"id": r[0], "nombre": r[1], "descripcion": r[2]}
     return None
 
+def obtener_area_por_id(area_id):
+    # ejemplo usando SQL, cámbialo según tu lógica y base de datos
+    from db import get_connection
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, nombre FROM areas WHERE id = %s", (area_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    if row:
+        return {"id": row[0], "nombre": row[1]}
+    return None
+
 def actualizar_area(area_id, nombre, descripcion):
     conn = get_connection()
     cur = conn.cursor()

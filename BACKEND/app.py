@@ -46,9 +46,67 @@ def extraer_texto_pdf(ruta_pdf):
 def pregunta_es_sobre_pdf(pregunta):
     pregunta = pregunta.lower()
     claves_pdf = [
-        "pdf", "documento", "adjunto", "archivo", "de qué trata", "resumen", "contenido", "explica", "según el pdf", "segun el pdf"
+        "pdf", "documento", "adjunto", "archivo", "de que trata", "de qué trata", "resumen", "contenido", "explica", "según el pdf", "segun el pdf"
     ]
     return any(clave in pregunta for clave in claves_pdf)
+
+
+def obtener_metadatos_pdf(pdf_id):
+    from servicios.area import obtener_area_por_id
+
+    # Primero busca en internos
+    tramite = obtener_tramite_interno(pdf_id)
+    if tramite:
+        from servicios.usuario import obtener_usuario_por_id
+        usuario = obtener_usuario_por_id(tramite["remitente_id"])
+        print("usuario remitente:", usuario)  # <-- agrega esto para debug
+        nombre_remitente = usuario["nombre"] if usuario else "Desconocido"
+        tramite["tipo_origen"] = "interno"
+        tramite["nombre_remitente"] = nombre_remitente
+        # Aquí el área del usuario remitente, no del trámite
+        area_id = usuario["area_id"] if usuario and "area_id" in usuario else None
+        nombre_area = None
+        if area_id:
+            area = obtener_area_por_id(area_id)
+            nombre_area = area["nombre"] if area else "Desconocida"
+        tramite["nombre_area"] = nombre_area
+        return tramite
+
+    # Ahora busca en externos
+    tramite = obtener_tramite_externo(pdf_id)
+    if tramite:
+        tramite["tipo_origen"] = "externo"
+        tramite["nombre_remitente"] = tramite.get("remitente")
+        return tramite
+
+    return {}
+
+    # Ahora busca en externos
+    tramite = obtener_tramite_externo(pdf_id)
+    if tramite:
+        tramite["tipo_origen"] = "externo"
+        tramite["nombre_remitente"] = tramite.get("remitente")
+        return tramite
+
+    return {}
+
+def construir_contexto_pdf(metadatos, texto_pdf):
+    contexto = ""
+    if metadatos:
+        partes = []
+        if metadatos.get("tipo_origen") == "externo":
+            partes.append("Tipo de documento: Externo")
+        elif metadatos.get("tipo_origen") == "interno":
+            partes.append("Tipo de documento: Interno")
+        if metadatos.get("asunto"):
+            partes.append(f"Asunto: {metadatos['asunto']}")
+        if metadatos.get("nombre_remitente"):
+            partes.append(f"Remitente: {metadatos['nombre_remitente']}")
+        if metadatos.get("fecha_registro") or metadatos.get("fecha_envio"):
+            partes.append(f"Fecha: {metadatos.get('fecha_registro') or metadatos.get('fecha_envio')}")
+        contexto += "\n".join(partes)
+    contexto += "\nContenido extraído del PDF:\n" + texto_pdf[:6000]
+    return contexto
 # --------- FIN AGREGADO PARA MANEJO DE PDF ---------
 
 app = FastAPI()
@@ -203,31 +261,55 @@ def chat(req: QueryRequest):
         area_id = usuario.get("area_id")
         rol = usuario.get("rol", "").lower()
 
-        # --------- AGREGADO PARA MANEJO DE PREGUNTAS PDF -----------
+        # --------- RESPUESTAS INTELIGENTES SOBRE PDF Y METADATOS ---------
         if hasattr(req, "pdf_id") and req.pdf_id and pregunta_es_sobre_pdf(pregunta):
             ruta_pdf = obtener_ruta_pdf_por_id(req.pdf_id)
             if not ruta_pdf:
                 return {"respuesta": "No se encontró el PDF seleccionado."}
             texto_pdf = extraer_texto_pdf(ruta_pdf)
-            if "de qué trata" in pregunta_lower or "resumen" in pregunta_lower:
-                resumen = texto_pdf[:500]
-                return {"respuesta": f"Resumen del PDF:\n{resumen}", "chat_history": req.chat_history or []}
-            else:
-                palabras = pregunta_lower.split()
-                fragmento = None
-                for palabra in palabras:
-                    if palabra in texto_pdf.lower():
-                        idx = texto_pdf.lower().index(palabra)
-                        fragmento = texto_pdf[max(0, idx-100):idx+400]
-                        break
-                if fragmento:
-                    return {"respuesta": f"En el PDF encontré:\n{fragmento}", "chat_history": req.chat_history or []}
-                else:
-                    extracto = texto_pdf[:500]
-                    return {"respuesta": f"No encontré una coincidencia exacta, pero aquí tienes parte del PDF:\n{extracto}", "chat_history": req.chat_history or []}
-        # --------- FIN AGREGADO PARA MANEJO DE PREGUNTAS PDF -----------
+            metadatos = obtener_metadatos_pdf(req.pdf_id)
+            contexto = construir_contexto_pdf(metadatos, texto_pdf)
 
-        # --- DATOS PERSONALES ---
+            # --- BLOQUE AGREGADO: RESPUESTA DIRECTA A "¿QUIÉN ENVIÓ ESTE DOCUMENTO?" ---
+            if (
+                "quien envio" in pregunta_lower or
+                "quién envió" in pregunta_lower or
+                "quien lo envio" in pregunta_lower or
+                "quién lo envió" in pregunta_lower
+            ):
+                tipo = metadatos.get("tipo_origen")
+                remitente = metadatos.get("nombre_remitente", "Desconocido")
+                if tipo == "externo":
+                    respuesta = f"El documento fue enviado por {remitente} (trámite externo)."
+                elif tipo == "interno":
+                    area = metadatos.get("nombre_area", "Desconocida")
+                    respuesta = f"El documento fue enviado por {remitente} (trámite interno) del área {area}."
+                else:
+                    respuesta = "No se pudo determinar quién envió el documento."
+                return {"respuesta": respuesta, "chat_history": req.chat_history or []}
+
+            # --- FIN BLOQUE AGREGADO ---
+
+            # Prompt personalizado para resumen o tema
+            if "de que trata" in pregunta_lower or "de qué trata" in pregunta_lower or "resumen" in pregunta_lower:
+                prompt_resumen = (
+                    "Analiza el siguiente contexto del documento y responde de forma natural en español, "
+                    "comenzando con: 'El documento trata de ...'. Si puedes, agrega un resumen en una o dos frases.\n"
+                    f"{contexto}\n\nPregunta: {pregunta}\nRespuesta en español:"
+                )
+                respuesta_pdf = llm(prompt_resumen)
+                return {"respuesta": respuesta_pdf.strip(), "chat_history": req.chat_history or []}
+            else:
+                # Para otras preguntas, como "fecha", etc
+                prompt_otros = (
+                    "Responde en español usando SOLO la información del contexto y el contenido del documento.\n"
+                    f"{contexto}\n\nPregunta: {pregunta}\nRespuesta en español:"
+                )
+                respuesta_pdf = llm(prompt_otros)
+                return {"respuesta": respuesta_pdf.strip(), "chat_history": req.chat_history or []}
+        # --------- FIN RESPUESTAS PDF ---------
+        
+        # --- CONSULTAS PERSONALES ---
         if "mi nombre" in pregunta_lower:
             nombre = usuario.get("nombre", "No se pudo obtener tu nombre.")
             return {"respuesta": f"Tu nombre es: {nombre}", "chat_history": req.chat_history or []}

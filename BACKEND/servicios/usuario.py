@@ -54,6 +54,17 @@ def obtener_usuario(usuario_id):
         }
     return None
 
+def obtener_usuario_por_id(usuario_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, nombre, area_id FROM usuarios WHERE id = %s", (usuario_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    if row:
+        return {"id": row[0], "nombre": row[1], "area_id": row[2]}
+    return None
+
 def actualizar_usuario(usuario_id, datos):
     conn = get_connection()
     cur = conn.cursor()
