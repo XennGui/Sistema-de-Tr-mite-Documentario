@@ -2,7 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { FaRobot, FaTimes, FaPaperPlane, FaSyncAlt, FaBroom, FaDatabase, FaMagic } from "react-icons/fa";
+import TramitePdfSelector from "./TramitePdfSelector";
 import "../styles/ChatbotMunicipal.css";
+import "../styles/TramitePdfSelector.css";
 
 export default function ChatbotMunicipal({ placement = "center" }) {
     const [open, setOpen] = useState(false);
@@ -13,10 +15,11 @@ export default function ChatbotMunicipal({ placement = "center" }) {
     const [msgBot, setMsgBot] = useState("");
     const [entrenando, setEntrenando] = useState(false);
     const [pdfIdActual, setPdfIdActual] = useState(null);
+    const [tramiteSelectorOpen, setTramiteSelectorOpen] = useState(false);
+    const [pdfPendiente, setPdfPendiente] = useState(null); // Nuevo: PDF seleccionado pendiente de enviar
 
     const chatEndRef = useRef(null);
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
-    
     const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
 
     useEffect(() => {
@@ -29,6 +32,8 @@ export default function ChatbotMunicipal({ placement = "center" }) {
         setChat([]);
         setPregunta("");
         setMsgBot("¡Conversación limpiada!");
+        setPdfIdActual(null);
+        setPdfPendiente(null);
         setTimeout(() => setMsgBot(""), 1200);
     };
 
@@ -46,49 +51,73 @@ export default function ChatbotMunicipal({ placement = "center" }) {
         setTimeout(() => setMsgBot(""), 2500);
     };
 
+    // Manejo del envío: si hay pdfPendiente, lo sube, si no, pregunta normal
     const enviarPregunta = async (e) => {
         e.preventDefault();
-        if (!pregunta.trim()) return;
-        setMsgBot("");
-        setChat(prev => [...prev, { pregunta, respuesta: "..." }]);
-        setLoading(true);
-        try {
-            const res = await fetch(`${apiUrl}/chat`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    pregunta,
-                    usar_bd: usarBD,
-                    chat_history: chat.map(m => [m.pregunta, m.respuesta]),
-                    usuario_id: usuario?.id || null,
-                    usuario: usuario || null,
-                    pdf_id: pdfIdActual || null
-                }),
-            });
-            const data = await res.json();
-            setChat(prev =>
-                prev.map((m, idx) =>
-                    idx === prev.length - 1 ? { ...m, respuesta: data.respuesta } : m
-                )
-            );
-            setPregunta("");
-        } catch (err) {
-            setChat(prev =>
-                prev.map((m, idx) =>
-                    idx === prev.length - 1
-                        ? { ...m, respuesta: "Error al responder. Intenta de nuevo." }
-                        : m
-                )
-            );
+        if (loading || entrenando) return;
+        if (pdfPendiente) {
+            // Subir PDF al chat como mensaje del usuario
+            setChat(prev => [
+                ...prev,
+                {
+                    pregunta: `📎 ${pdfPendiente.nombre}`,
+                    respuesta: "PDF recibido: puedes realizar cualquier pregunta sobre el archivo.",
+                    pdf_id: pdfPendiente.tramiteId,
+                    pdf_filename: pdfPendiente.nombre
+                }
+            ]);
+            setPdfIdActual(pdfPendiente.tramiteId);
+            setPdfPendiente(null);
+            setPregunta(""); // limpia input
+        } else if (pregunta.trim()) {
+            setMsgBot("");
+            setChat(prev => [...prev, { pregunta, respuesta: "..." }]);
+            setLoading(true);
+            try {
+                const res = await fetch(`${apiUrl}/chat`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        pregunta,
+                        usar_bd: usarBD,
+                        chat_history: chat.map(m => [m.pregunta, m.respuesta]),
+                        usuario_id: usuario?.id || null,
+                        usuario: usuario || null,
+                        pdf_id: pdfIdActual || null
+                    }),
+                });
+                const data = await res.json();
+                setChat(prev =>
+                    prev.map((m, idx) =>
+                        idx === prev.length - 1 ? { ...m, respuesta: data.respuesta } : m
+                    )
+                );
+                setPregunta("");
+            } catch (err) {
+                setChat(prev =>
+                    prev.map((m, idx) =>
+                        idx === prev.length - 1
+                            ? { ...m, respuesta: "Error al responder. Intenta de nuevo." }
+                            : m
+                    )
+                );
+            }
+            setLoading(false);
         }
-        setLoading(false);
     };
 
+    const handlePdfClipClick = (e) => {
+        e.preventDefault();
+        if (usarBD) {
+            setTramiteSelectorOpen(true);
+        } else {
+            document.getElementById("pdf-upload").click();
+        }
+    };
 
     const placementStyle = placement === "center"
         ? { position: "fixed", left: "50%", top: "10vh", transform: "translateX(-50%)", zIndex: 2001 }
         : { position: "fixed", right: "32px", bottom: "100px", zIndex: 2001 };
-
 
     return (
         <>
@@ -133,7 +162,7 @@ export default function ChatbotMunicipal({ placement = "center" }) {
                                 chat.map((m, idx) => (
                                     <div key={idx}>
                                         <div className="chatbot-q">{m.pregunta}</div>
-                                        <div className="chatbot-a">{m.respuesta}</div>
+                                        <div className="chatbot-a" dangerouslySetInnerHTML={{__html: m.respuesta}} />
                                     </div>
                                 ))
                             )}
@@ -141,7 +170,13 @@ export default function ChatbotMunicipal({ placement = "center" }) {
                         </div>
                         {/* Barra inferior alineada */}
                         <div className="chatbot-modal-bottombar">
-                            <label htmlFor="pdf-upload" className="pdf-clip-btn">📎</label>
+                            <label
+                                className="pdf-clip-btn"
+                                tabIndex={0}
+                                onClick={handlePdfClipClick}
+                                style={{ cursor: "pointer", fontSize: 22 }}
+                                title={usarBD ? "Seleccionar trámite y PDF" : "Subir PDF"}
+                            >📎</label>
                             <input
                                 id="pdf-upload"
                                 type="file"
@@ -157,7 +192,7 @@ export default function ChatbotMunicipal({ placement = "center" }) {
                                     setChat(prev => [
                                         ...prev,
                                         {
-                                            pregunta: "",
+                                            pregunta: `📎 ${file.name}`,
                                             respuesta: `<b>Archivo subido:</b> ${file.name}`,
                                             pdf_id: data.pdf_id,
                                             pdf_filename: file.name
@@ -169,17 +204,35 @@ export default function ChatbotMunicipal({ placement = "center" }) {
                             <form className="chatbot-modal-form" onSubmit={enviarPregunta}>
                                 <input
                                     id="chatbot-input"
-                                    value={pregunta}
+                                    value={pdfPendiente ? `📎 ${pdfPendiente.nombre}` : pregunta}
                                     onChange={e => setPregunta(e.target.value)}
-                                    placeholder={usarBD ? "Consulta estructurada a BD..." : "Escribe tu consulta a la IA..."}
-                                    disabled={loading || entrenando}
+                                    placeholder={usarBD
+                                        ? pdfPendiente
+                                            ? "Presiona Enviar para subir el PDF"
+                                            : "Consulta estructurada a BD..."
+                                        : "Escribe tu consulta a la IA..."}
+                                    disabled={loading || entrenando || !!pdfPendiente && usarBD}
                                     autoFocus
                                 />
-                                <button type="submit" disabled={loading || !pregunta.trim() || entrenando}>
+                                <button
+                                    type="submit"
+                                    disabled={loading || entrenando || (!!pdfPendiente && !usarBD) || (!pdfPendiente && !pregunta.trim())}
+                                >
                                     <FaPaperPlane />
                                 </button>
                             </form>
                         </div>
+                        {/* Selector de trámite y PDF, solo cuando Consulta BD está activa */}
+                        <TramitePdfSelector
+                            open={tramiteSelectorOpen}
+                            onClose={() => setTramiteSelectorOpen(false)}
+                            apiUrl={apiUrl}
+                            usuario={usuario}
+                            onSelectPdf={(pdfInfo) => {
+                                setPdfPendiente(pdfInfo);
+                                setPregunta("");
+                            }}
+                        />
                     </div>
                 </div>
             )}

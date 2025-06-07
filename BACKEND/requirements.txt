@@ -16,3 +16,4 @@ dateparser
 email-validator
 python-multipart
 pytz
+PyPDF2

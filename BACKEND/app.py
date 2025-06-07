@@ -7,7 +7,7 @@ from rutas.tramite_externo import router as tramite_externo_router
 from rutas.tramite_interno import router as tramite_interno_router
 from rutas.seguimiento_tramite import router as seguimiento_tramite_router
 from rutas.derivacion import router as derivacion_router
-from rutas.documento_generado import router as documento_generado_router    
+from rutas.documento_generado import router as documento_generado_router 
 from pydantic import BaseModel
 from typing import Dict, Optional, List, Tuple
 from embeddings import create_embeddings, save_vectorstore, load_vectorstore, prepare_docs_from_db
@@ -18,6 +18,38 @@ from langchain_ollama import OllamaLLM
 import unicodedata
 import re
 import dateparser
+
+# --------- AGREGADO PARA MANEJO DE PDF ---------
+import os
+import PyPDF2
+
+from servicios.tramite_externo import obtener_tramite_externo
+from servicios.tramite_interno import obtener_tramite_interno
+
+def obtener_ruta_pdf_por_id(pdf_id):
+    tramite = obtener_tramite_externo(pdf_id)
+    if tramite and tramite.get("archivo") and os.path.exists(tramite["archivo"]):
+        return tramite["archivo"]
+    tramite = obtener_tramite_interno(pdf_id)
+    if tramite and tramite.get("archivo") and os.path.exists(tramite["archivo"]):
+        return tramite["archivo"]
+    return None
+
+def extraer_texto_pdf(ruta_pdf):
+    texto = ""
+    with open(ruta_pdf, "rb") as f:
+        lector = PyPDF2.PdfReader(f)
+        for page in lector.pages:
+            texto += page.extract_text() or ""
+    return texto
+
+def pregunta_es_sobre_pdf(pregunta):
+    pregunta = pregunta.lower()
+    claves_pdf = [
+        "pdf", "documento", "adjunto", "archivo", "de qué trata", "resumen", "contenido", "explica", "según el pdf", "segun el pdf"
+    ]
+    return any(clave in pregunta for clave in claves_pdf)
+# --------- FIN AGREGADO PARA MANEJO DE PDF ---------
 
 app = FastAPI()
 
@@ -63,6 +95,7 @@ class QueryRequest(BaseModel):
     chat_history: Optional[List[Tuple[str, str]]] = None
     usuario_id: Optional[int] = None
     usuario: Optional[Dict] = None
+    pdf_id: Optional[int] = None  # <-- AGREGADO
 
 def quitar_tildes(texto: str) -> str:
     return ''.join(c for c in unicodedata.normalize('NFD', texto) if unicodedata.category(c) != 'Mn')
@@ -169,6 +202,30 @@ def chat(req: QueryRequest):
         usuario = req.usuario or {}
         area_id = usuario.get("area_id")
         rol = usuario.get("rol", "").lower()
+
+        # --------- AGREGADO PARA MANEJO DE PREGUNTAS PDF -----------
+        if hasattr(req, "pdf_id") and req.pdf_id and pregunta_es_sobre_pdf(pregunta):
+            ruta_pdf = obtener_ruta_pdf_por_id(req.pdf_id)
+            if not ruta_pdf:
+                return {"respuesta": "No se encontró el PDF seleccionado."}
+            texto_pdf = extraer_texto_pdf(ruta_pdf)
+            if "de qué trata" in pregunta_lower or "resumen" in pregunta_lower:
+                resumen = texto_pdf[:500]
+                return {"respuesta": f"Resumen del PDF:\n{resumen}", "chat_history": req.chat_history or []}
+            else:
+                palabras = pregunta_lower.split()
+                fragmento = None
+                for palabra in palabras:
+                    if palabra in texto_pdf.lower():
+                        idx = texto_pdf.lower().index(palabra)
+                        fragmento = texto_pdf[max(0, idx-100):idx+400]
+                        break
+                if fragmento:
+                    return {"respuesta": f"En el PDF encontré:\n{fragmento}", "chat_history": req.chat_history or []}
+                else:
+                    extracto = texto_pdf[:500]
+                    return {"respuesta": f"No encontré una coincidencia exacta, pero aquí tienes parte del PDF:\n{extracto}", "chat_history": req.chat_history or []}
+        # --------- FIN AGREGADO PARA MANEJO DE PREGUNTAS PDF -----------
 
         # --- DATOS PERSONALES ---
         if "mi nombre" in pregunta_lower:
