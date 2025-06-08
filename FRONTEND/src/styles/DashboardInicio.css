@@ -65,7 +65,7 @@
     font-weight: bold;
 }
 
-/* Gráficos: ocupa todo el ancho y centrados */
+/* para gráficos: ocupa todo el ancho y centrados */
 .dashboard-graficos-superrow {
     width: 100%;
     display: flex;
