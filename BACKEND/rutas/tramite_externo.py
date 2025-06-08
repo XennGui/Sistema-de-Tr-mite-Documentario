@@ -1,5 +1,4 @@
-# RUTA: rutas/tramite_externo.py
-# --- Agrega endpoint para contestar trámite externo y sirve archivos PDF correctamente ---
+# rutas/tramite_externo.py
 
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Query, Body
 from esquemas.tramite_externo import (
@@ -120,7 +119,7 @@ async def crear_tramite(
     else:
         fecha_registro_lima = fecha_actual
 
-    fecha_registro_str = fecha_registro_lima.strftime("%Y-%m-%dT%H:%M:%S") # Formato ISO para frontend
+    fecha_registro_str = fecha_registro_lima.strftime("%Y-%m-%dT%H:%M:%S") #formato ISO
 
     tramite = {
         **datos,
@@ -176,10 +175,9 @@ def buscar_tramite(
     if not tramite:
         raise HTTPException(status_code=404, detail="No se encontró el trámite con esos datos.")
 
-    # Busca la respuesta PDF más reciente en el seguimiento
     movimientos = obtener_seguimiento_de_tramite_externo(tramite["id"])
     pdf_respuesta = None
-    for mov in reversed(movimientos):  # del más reciente al más antiguo
+    for mov in reversed(movimientos): 
         if mov["accion"] == "contestado" and mov["adjunto"]:
             pdf_respuesta = mov["adjunto"]
             break
@@ -203,7 +201,6 @@ def obtener(tramite_id: int):
     tramite = obtener_tramite_externo(tramite_id)
     if not tramite:
         raise HTTPException(status_code=404, detail="Trámite externo no encontrado")
-    # Formato ISO
     if tramite and tramite["fecha_registro"] and not isinstance(tramite["fecha_registro"], str):
         tramite["fecha_registro"] = tramite["fecha_registro"].isoformat()
     return {
@@ -235,7 +232,6 @@ def eliminar(tramite_id: int):
         "id": tramite_id
     }
 
-# --- NUEVO ENDPOINT PARA CONTESTAR TRÁMITE EXTERNO (texto o PDF) ---
 @router.post("/{tramite_id}/contestar", response_model=dict)
 async def contestar_tramite_externo(
     tramite_id: int,
@@ -252,19 +248,17 @@ async def contestar_tramite_externo(
             f.write(contenido_pdf)
         archivo_nombre = ruta
 
-    # Guarda en seguimiento_tramites la respuesta
     from servicios.seguimiento_tramite import crear_seguimiento_tramite
     crear_seguimiento_tramite({
         "tramite_id": tramite_id,
         "tramite_type": "externo",
         "accion": "contestado",
         "descripcion": respuesta or "Respuesta adjunta.",
-        "usuario_id": 1,  # Aquí deberías tomar el usuario autenticado si tienes auth
+        "usuario_id": 1, 
         "area_id": None,
         "adjunto": archivo_nombre,
         "observaciones": None
     })
-    # Actualiza estado a atendido
     actualizar_tramite_externo(tramite_id, {"estado": "atendido"})
 
     return {
@@ -273,7 +267,6 @@ async def contestar_tramite_externo(
         "pdf_respuesta": archivo_nombre
     }
 
-# --- NUEVO ENDPOINT PARA DERIVAR TRÁMITE EXTERNO ---
 @router.post("/{tramite_id}/derivar", response_model=dict)
 def derivar_tramite_externo(
     tramite_id: int,
@@ -290,11 +283,10 @@ def derivar_tramite_externo(
         raise HTTPException(status_code=404, detail="Trámite externo no encontrado.")
 
     area_origen_id = tramite.get("area_actual_id")
-    usuario_id = 1  # Cambia por el usuario autenticado si tienes login
+    usuario_id = 1  
 
-    # --- CORRECCIÓN: Si area_origen_id es None, pon area_destino_id o un valor por defecto ---
     if area_origen_id is None:
-        area_origen_id = area_destino_id   # O pon el ID real de Mesa de Partes si quieres
+        area_origen_id = area_destino_id  
 
     registrar_derivacion({
         "tramite_id": tramite_id,

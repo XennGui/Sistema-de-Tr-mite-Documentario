@@ -1,6 +1,4 @@
-# --- RUTA: rutas/tramite_interno.py ---
-# rutas/tramite_interno.py
-# Endpoints completos para gestión de trámites internos en una municipalidad
+# rutas/tramite_interno.py 
 
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Query, Body, Response
 from esquemas.tramite_interno import TramiteInternoCrear, TramiteInternoActualizar
@@ -20,7 +18,6 @@ from datetime import datetime
 
 router = APIRouter(prefix="/tramites-internos", tags=["Trámites Internos"])
 
-# ---- CREAR TRÁMITE INTERNO ----
 @router.post("/", response_model=dict)
 async def crear_tramite_interno_endpoint(
     numero_referencia: str = Form(...),
@@ -59,7 +56,6 @@ async def crear_tramite_interno_endpoint(
     }
     tramite_id, fecha_envio = crear_tramite_interno(datos)
 
-    # Registrar movimiento inicial en seguimiento
     crear_seguimiento_tramite({
         "tramite_id": tramite_id,
         "tramite_type": "interno",
@@ -77,7 +73,6 @@ async def crear_tramite_interno_endpoint(
         "tramite": tramite
     }
 
-# ---- LISTAR TRÁMITES INTERNOS ----
 @router.get("/", response_model=dict)
 def listar(
     rol: str = Query(..., description="Rol del usuario logueado"),
@@ -102,7 +97,6 @@ def listar(
         "tramites": tramites
     }
 
-# ---- OBTENER TRÁMITE INTERNO POR ID ----
 @router.get("/{tramite_id}", response_model=dict)
 def obtener(tramite_id: int):
     tramite = obtener_tramite_interno(tramite_id)
@@ -113,7 +107,6 @@ def obtener(tramite_id: int):
         "tramite": tramite
     }
 
-# ---- HISTORIAL / SEGUIMIENTO ----
 @router.get("/{tramite_id}/seguimiento", response_model=dict)
 def seguimiento_tramite(tramite_id: int):
     movimientos = obtener_seguimiento_de_tramite_interno(tramite_id)
@@ -122,7 +115,6 @@ def seguimiento_tramite(tramite_id: int):
         "seguimiento": movimientos
     }
 
-# ---- DERIVAR TRÁMITE INTERNO ----
 @router.post("/{tramite_id}/derivar", response_model=dict)
 def derivar_tramite_interno(
     tramite_id: int,
@@ -170,7 +162,6 @@ def derivar_tramite_interno(
         "area_destino_id": area_destino_id
     }
 
-# ---- CONTESTAR / ATENDER TRÁMITE INTERNO ----
 @router.post("/{tramite_id}/contestar", response_model=dict)
 async def contestar_tramite_interno(
     tramite_id: int,
@@ -205,7 +196,6 @@ async def contestar_tramite_interno(
         "pdf_respuesta": archivo_nombre
     }
 
-# ---- RECIBIR TRÁMITE (marcar como recibido) ----
 @router.post("/{tramite_id}/recibir", response_model=dict)
 def recibir_tramite_interno(
     tramite_id: int,
@@ -234,10 +224,8 @@ def recibir_tramite_interno(
         "fecha_recepcion": now.isoformat()
     }
 
-# ---- DESCARGA / VISUALIZACIÓN DE PDF (seguro) ----
 @router.get("/archivo/{carpeta}/{nombre_archivo}", response_class=Response)
 def descargar_pdf(carpeta: str, nombre_archivo: str):
-    # carpeta: "archivos_tramites_internos" o "respuestas_tramites_internos"
     directorio = os.path.join(os.getcwd(), carpeta)
     ruta = os.path.join(directorio, nombre_archivo)
     if not os.path.isfile(ruta):
@@ -246,7 +234,6 @@ def descargar_pdf(carpeta: str, nombre_archivo: str):
         contenido = f.read()
     return Response(content=contenido, media_type="application/pdf")
 
-# ---- LISTA DE ÁREAS Y USUARIOS (para selects) ----
 @router.get("/areas", response_model=dict)
 def listar_areas():
     areas = obtener_areas()

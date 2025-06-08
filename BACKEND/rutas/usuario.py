@@ -58,7 +58,6 @@ def actualizar(usuario_id: int, usuario: UsuarioActualizar):
     actualizado = actualizar_usuario(usuario_id, datos)
     if not actualizado:
         raise HTTPException(status_code=404, detail="Usuario no encontrado o sin cambios")
-    # Retornar los datos nuevos, mezclando el dict de entrada con el id
     usuario_actual = obtener_usuario(usuario_id)
     return {
         "mensaje": "Usuario actualizado exitosamente.",
@@ -94,7 +93,7 @@ def login(datos: dict = Body(...)):
     user = cur.fetchone()
     cur.close()
     conn.close()
-    if user and user[6] == password:  # user[6] es el campo password
+    if user and user[6] == password:  
         return {
             "exito": True,
             "usuario": {
