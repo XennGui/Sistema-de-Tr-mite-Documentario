@@ -213,6 +213,20 @@
     border: 2px solid #ffb3b3;
 }
 
+.tramite-exito-bg{
+    background-image: url('../assets/municipio.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
 .tramite-exito {
     max-width: 550px;
     margin: 0 auto;

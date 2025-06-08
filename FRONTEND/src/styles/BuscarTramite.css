@@ -1,5 +1,17 @@
 /* src/styles/BuscarTramite.css */
 
+.buscar-tramite-bg {
+    background-image: url('../assets/fondo.jpeg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
 .buscar-tramite-contenedor {
     max-width: 900px;
     margin: 36px auto;

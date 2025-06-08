@@ -153,15 +153,17 @@ export default function RegistrarTramite() {
 
     if (mensaje) {
         return (
-            <div className="tramite-exito">
-                <h2><FaRegFileAlt style={{ verticalAlign: "middle" }} /> {mensaje}</h2>
-                <p>
-                    Puede descargar su cargo en formato PDF, así mismo puede hacer su seguimiento de sus trámites a través de esta plataforma simplemente ingresando el número de expediente y su código de seguridad.
-                </p>
-                <button className="registrar-tramite-btn" onClick={handleImprimirCargo}>
-                    <FaFilePdf style={{ verticalAlign: "middle" }} /> Imprimir cargo PDF
-                </button>
-                <button className="registrar-tramite-btn" onClick={() => navigate("/")}>Volver al inicio</button>
+            <div className="tramite-exito-bg">
+                <div className="tramite-exito">
+                    <h2><FaRegFileAlt style={{ verticalAlign: "middle" }} /> {mensaje}</h2>
+                    <p>
+                        Puede descargar su cargo en formato PDF, así mismo puede hacer su seguimiento de sus trámites a través de esta plataforma simplemente ingresando el número de expediente y su código de seguridad.
+                    </p>
+                    <button className="registrar-tramite-btn" onClick={handleImprimirCargo}>
+                        <FaFilePdf style={{ verticalAlign: "middle" }} /> Imprimir cargo PDF
+                    </button>
+                    <button className="registrar-tramite-btn" onClick={() => navigate("/")}>Volver al inicio</button>
+                </div>
             </div>
         );
     }
