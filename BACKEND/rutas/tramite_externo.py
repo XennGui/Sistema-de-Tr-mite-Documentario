@@ -24,24 +24,31 @@ from email.mime.multipart import MIMEMultipart
 
 router = APIRouter(prefix="/tramites-externos", tags=["Trámites Externos"])
 
-MESA_PARTES_CORREO = "xennia.guissel@gmail.com"
-MESA_PARTES_CLAVE = "familiaITO1972"
+MESA_PARTES_CORREO = "xen.luna.07@gmail.com"
+MESA_PARTES_CLAVE = "hvqicgclgwzsbyoo"
 
 def enviar_correo_a_mesa(tramite):
-    asunto = f"Nuevo trámite externo registrado: {tramite['numero_expediente']}"
+    asunto = f"📢 Nuevo trámite externo registrado: {tramite['numero_expediente']}"
     cuerpo = f"""
-Se ha registrado un nuevo trámite externo en la plataforma municipal:
+📄 *Nuevo trámite externo registrado en la plataforma municipal de Yau* 📄
 
-- Nº expediente: {tramite['numero_expediente']}
-- Remitente: {tramite['remitente']}
-- Tipo de documento: {tramite['tipo_documento']}
-- Folios: {tramite['folios']}
-- Asunto: {tramite['asunto']}
-- Código de seguridad: {tramite['codigo_seguridad']}
-- Fecha y Hora: {tramite['fecha_registro']}
-- Correo: {tramite['email']}
-- Teléfono: {tramite['telefono'] or '-'}
-    """
+🔹 *Detalles del trámite:*
+-----------------------------------
+🗂️ Nº expediente      : {tramite['numero_expediente']}
+👤 Remitente         : {tramite['remitente']}
+📑 Tipo de documento : {tramite['tipo_documento']}
+📄 Folios            : {tramite['folios']}
+📝 Asunto            : {tramite['asunto']}
+🔐 Código de seguridad: {tramite['codigo_seguridad']}
+🕒 Fecha y Hora      : {tramite['fecha_registro']}
+📧 Correo remitente  : {tramite['email']}
+📞 Teléfono          : {tramite['telefono'] or '-'}
+
+⚠️ Por favor, no responda a este correo, ya que es un mensaje automático generado por la plataforma municipal.
+
+🤝 Atentamente,
+Sistema de Trámites Externos
+"""
 
     msg = MIMEMultipart()
     msg["From"] = MESA_PARTES_CORREO
