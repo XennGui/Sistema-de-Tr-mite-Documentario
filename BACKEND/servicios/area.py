@@ -33,8 +33,6 @@ def obtener_area(area_id):
     return None
 
 def obtener_area_por_id(area_id):
-    # ejemplo usando SQL, cámbialo según tu lógica y base de datos
-    from db import get_connection
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("SELECT id, nombre FROM areas WHERE id = %s", (area_id,))

@@ -68,7 +68,6 @@ def obtener_usuario_por_id(usuario_id):
 def actualizar_usuario(usuario_id, datos):
     conn = get_connection()
     cur = conn.cursor()
-    #solo actualiza los campos que no son None
     campos = []
     valores = []
     for campo in ["nombre", "area_id", "username", "password", "email", "rol"]:

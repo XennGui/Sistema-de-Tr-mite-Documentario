@@ -132,4 +132,3 @@ def eliminar_derivacion(derivacion_id):
     cur.close()
     conn.close()
     return result is not None
-
