@@ -52,7 +52,6 @@ export default function TramitesExternos({ usuarioLogueado }) {
     const [estadoFiltro, setEstadoFiltro] = useState("");
     const [busqueda, setBusqueda] = useState("");
 
-    //cargar trámites del backend
     const fetchTramites = async () => {
         setLoading(true);
         setError("");

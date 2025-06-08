@@ -198,7 +198,7 @@ export default function TramitesInternos({ usuarioLogueado }) {
         setLoading(false);
     };
 
-    // Recibir trámite (solo si el trámite está en estado "derivado" y el usuario es del área destino)
+    // recibe trámite (solo si el trámite está en estado derivado y el usuario es del área destino)
     const recibirTramite = async (t) => {
         setTramiteSel(t);
         setLoading(true);
@@ -511,7 +511,7 @@ export default function TramitesInternos({ usuarioLogueado }) {
                     </div>
                 </div>
             )}
-            
+
             {/* MODAL CONTESTAR */}
             {modalContestar && tramiteSel && (
                 <div className="modal-bg">

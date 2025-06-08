@@ -15,7 +15,6 @@ export default function Login() {
     const [cargando, setCargando] = useState(false);
     const navigate = useNavigate();
 
-    //si ya está logueado, redirige al dashboard
     useEffect(() => {
         if (localStorage.getItem("usuario")) {
             navigate("/dashboard", { replace: true });

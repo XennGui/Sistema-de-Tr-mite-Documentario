@@ -41,14 +41,12 @@ export default function BuscarTramite() {
         }
         setLoading(true);
         try {
-            // Buscar trámite
             const url = `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/tramites-externos/buscar?numero_expediente=${encodeURIComponent(expediente)}&codigo_seguridad=${encodeURIComponent(codigo)}`;
             const res = await fetch(url);
             const data = await res.json();
             if (!res.ok) throw new Error(data.detail || "No se encontró el trámite.");
             setTramite(data.tramite);
 
-            // Buscar seguimiento del trámite
             const urlSeg = `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/tramites-externos/${data.tramite.id}/seguimiento`;
             const resSeg = await fetch(urlSeg);
             const dataSeg = await resSeg.json();

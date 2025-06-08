@@ -128,7 +128,6 @@ export default function Usuarios() {
                 usuarioActualizado = respuesta.usuario;
             }
 
-            // --- SOLUCIÓN: Actualiza localStorage si es el usuario logueado ---
             const usuarioLogueado = JSON.parse(localStorage.getItem("usuario") || "{}");
             if (editando && usuarioActualizado && usuarioActualizado.id === usuarioLogueado.id) {
                 localStorage.setItem("usuario", JSON.stringify({

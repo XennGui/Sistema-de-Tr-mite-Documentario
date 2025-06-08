@@ -87,7 +87,6 @@ export default function RegistrarTramite() {
         }
     };
 
-    //PDF con logo, cabecera y tabla alineada profesional
     const handleImprimirCargo = () => {
         if (!cargoData) return;
         const doc = new jsPDF({
