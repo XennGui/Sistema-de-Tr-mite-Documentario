@@ -18,8 +18,6 @@ from langchain_ollama import OllamaLLM
 import unicodedata
 import re
 import dateparser
-
-# --------- AGREGADO PARA MANEJO DE PDF ---------
 import os
 import PyPDF2
 
@@ -53,7 +51,6 @@ def pregunta_es_sobre_pdf(pregunta):
 def obtener_metadatos_pdf(pdf_id):
     from servicios.area import obtener_area_por_id
 
-    # Primero busca en internos
     tramite = obtener_tramite_interno(pdf_id)
     if tramite:
         from servicios.usuario import obtener_usuario_por_id
@@ -69,7 +66,6 @@ def obtener_metadatos_pdf(pdf_id):
         tramite["nombre_area"] = nombre_area
         return tramite
 
-    # Ahora busca en externos
     tramite = obtener_tramite_externo(pdf_id)
     if tramite:
         tramite["tipo_origen"] = "externo"
@@ -95,14 +91,14 @@ def construir_contexto_pdf(metadatos, texto_pdf):
         contexto += "\n".join(partes)
     contexto += "\nContenido extraído del PDF:\n" + texto_pdf[:6000]
     return contexto
-# --------- FIN AGREGADO PARA MANEJO DE PDF ---------
+
 
 app = FastAPI()
 
 app.mount("/archivos_tramites", StaticFiles(directory="archivos_tramites"), name="archivos_tramites")
 app.mount("/respuestas_tramites", StaticFiles(directory="respuestas_tramites"), name="respuestas_tramites")
 
-# Configuración CORS para React-Vite
+#configuración CORS para React-Vite
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -119,14 +115,12 @@ app.include_router(seguimiento_tramite_router)
 app.include_router(derivacion_router)
 app.include_router(documento_generado_router)
 
-# Carga y configuración del modelo
 vectorstore = load_vectorstore()
 retriever = None
 qa_chain = None
 llm_chain = None
 llm = OllamaLLM(model="llama2", base_url="http://localhost:11434")
 
-# Plantilla para generar prompts
 template = """Eres un asistente que responde en español basado en el siguiente contexto:
 {context}
 
@@ -134,14 +128,13 @@ Pregunta: {question}
 Respuesta en español:"""
 prompt = PromptTemplate(input_variables=["context", "question"], template=template)
 
-# Modelo de datos para las preguntas
 class QueryRequest(BaseModel):
     pregunta: str
     usar_bd: bool = False
     chat_history: Optional[List[Tuple[str, str]]] = None
     usuario_id: Optional[int] = None
     usuario: Optional[Dict] = None
-    pdf_id: Optional[int] = None  # <-- AGREGADO
+    pdf_id: Optional[int] = None  
 
 def quitar_tildes(texto: str) -> str:
     return ''.join(c for c in unicodedata.normalize('NFD', texto) if unicodedata.category(c) != 'Mn')
@@ -154,7 +147,6 @@ def startup_event():
         qa_chain = ConversationalRetrievalChain.from_llm(llm, retriever, combine_docs_chain_kwargs={"prompt": prompt})
     llm_chain = LLMChain(llm=llm, prompt=prompt)
 
-# Endpoint para reentrenar embeddings
 @app.post("/reentrenar")
 def reentrenar_embeddings():
     global vectorstore, retriever, qa_chain
@@ -204,28 +196,24 @@ def contar_estados_tramites(tipo_tramite, area_id=None, usuario_id=None, estado=
         condiciones = []
         parametros = []
         
-        # Filtro por área
         if area_id:
             if tipo_tramite == "interno":
                 condiciones.append("area_destino_id = %s")
-            else:  # externo
+            else:  
                 condiciones.append("area_actual_id = %s")
             parametros.append(area_id)
         
-        # Filtro por usuario
         if usuario_id:
             if tipo_tramite == "interno":
                 condiciones.append("remitente_id = %s")
-            else:  # externo
+            else:  
                 condiciones.append("usuario_registro_id = %s")
             parametros.append(usuario_id)
         
-        # Filtro por estado específico
         if estado:
             condiciones.append("estado = %s")
             parametros.append(estado)
         
-        # Construir la consulta SQL
         sql = f"SELECT COUNT(*) FROM {tabla}"
         if condiciones:
             sql += " WHERE " + " AND ".join(condiciones)
@@ -249,7 +237,7 @@ def chat(req: QueryRequest):
         area_id = usuario.get("area_id")
         rol = usuario.get("rol", "").lower()
 
-        # --------- RESPUESTAS INTELIGENTES SOBRE PDF Y METADATOS ---------
+        # --------- RESPUESTAS SOBRE PDF Y METADATOS ---------
         if hasattr(req, "pdf_id") and req.pdf_id and pregunta_es_sobre_pdf(pregunta):
             ruta_pdf = obtener_ruta_pdf_por_id(req.pdf_id)
             if not ruta_pdf:
@@ -258,7 +246,6 @@ def chat(req: QueryRequest):
             metadatos = obtener_metadatos_pdf(req.pdf_id)
             contexto = construir_contexto_pdf(metadatos, texto_pdf)
 
-            # --- BLOQUE AGREGADO: RESPUESTA DIRECTA A "¿QUIÉN ENVIÓ ESTE DOCUMENTO?" ---
             if (
                 "quien envio" in pregunta_lower or
                 "quién envió" in pregunta_lower or
@@ -276,7 +263,6 @@ def chat(req: QueryRequest):
                     respuesta = "No se pudo determinar quién envió el documento."
                 return {"respuesta": respuesta, "chat_history": req.chat_history or []}
 
-            # --- FIN BLOQUE AGREGADO ---
             
             # Prompt personalizado para resumen o tema
             if "de que trata" in pregunta_lower or "de qué trata" in pregunta_lower or "resumen" in pregunta_lower:
@@ -288,14 +274,13 @@ def chat(req: QueryRequest):
                 respuesta_pdf = llm(prompt_resumen)
                 return {"respuesta": respuesta_pdf.strip(), "chat_history": req.chat_history or []}
             else:
-                # Para otras preguntas, como "fecha", etc
                 prompt_otros = (
                     "Responde en español usando SOLO la información del contexto y el contenido del documento.\n"
                     f"{contexto}\n\nPregunta: {pregunta}\nRespuesta en español:"
                 )
                 respuesta_pdf = llm(prompt_otros)
                 return {"respuesta": respuesta_pdf.strip(), "chat_history": req.chat_history or []}
-        # --------- FIN RESPUESTAS PDF ---------
+        
         
         # --- CONSULTAS PERSONALES ---
         if "mi nombre" in pregunta_lower:
@@ -313,39 +298,34 @@ def chat(req: QueryRequest):
 
         # --- CONSULTAS DE ESTADOS DE TRÁMITES ---
         if req.usar_bd:
-            # Consultas para trámites internos
+            #consultas para trámites internos
             if any(palabra in pregunta_lower for palabra in ["estado", "estados"]) and "interno" in pregunta_lower:
                 if es_mesa_partes(usuario):
-                    # Mesa de partes ve todos los estados
                     estados = ['pendiente', 'recibido', 'atendido', 'derivado', 'archivado']
                     conteos = {estado: contar_estados_tramites("interno", estado=estado) for estado in estados}
                     respuesta = "Estados de trámites internos en todo el sistema:\n" + "\n".join(
                         [f"- {estado.capitalize()}: {conteos[estado]}" for estado in estados])
                 else:
-                    # Usuario normal ve solo los de su área
                     estados = ['pendiente', 'recibido', 'atendido', 'derivado', 'archivado']
                     conteos = {estado: contar_estados_tramites("interno", area_id=area_id, estado=estado) for estado in estados}
                     respuesta = f"Estados de trámites internos en tu área:\n" + "\n".join(
                         [f"- {estado.capitalize()}: {conteos[estado]}" for estado in estados])
                 return {"respuesta": respuesta, "chat_history": req.chat_history or []}
 
-            # Consultas para trámites externos
+            #consultas para trámites externos
             if any(palabra in pregunta_lower for palabra in ["estado", "estados"]) and "externo" in pregunta_lower:
                 if es_mesa_partes(usuario):
-                    # Mesa de partes ve todos los estados
                     estados = ['pendiente', 'atendido', 'denegado', 'derivado', 'archivado']
                     conteos = {estado: contar_estados_tramites("externo", estado=estado) for estado in estados}
                     respuesta = "Estados de trámites externos en todo el sistema:\n" + "\n".join(
                         [f"- {estado.capitalize()}: {conteos[estado]}" for estado in estados])
                 else:
-                    # Usuario normal ve solo los de su área
                     estados = ['pendiente', 'atendido', 'denegado', 'derivado', 'archivado']
                     conteos = {estado: contar_estados_tramites("externo", area_id=area_id, estado=estado) for estado in estados}
                     respuesta = f"Estados de trámites externos en tu área:\n" + "\n".join(
                         [f"- {estado.capitalize()}: {conteos[estado]}" for estado in estados])
                 return {"respuesta": respuesta, "chat_history": req.chat_history or []}
 
-            # Consultas específicas por estado
             for estado in ['pendiente', 'recibido', 'atendido', 'denegado', 'derivado', 'archivado']:
                 if estado in pregunta_lower:
                     if "interno" in pregunta_lower:
@@ -367,7 +347,6 @@ def chat(req: QueryRequest):
 
         # --- CONSULTAS GLOBALES/ADMIN/MESA DE PARTES ---
         if req.usar_bd and es_mesa_partes(usuario):
-            # Usuarios/áreas solo para admin y mesa de partes
             if "cuantos usuarios" in pregunta_lower or "total de usuarios" in pregunta_lower:
                 sql = "SELECT COUNT(*) FROM usuarios;"
                 resultado = consulta_sql(sql)
@@ -385,7 +364,6 @@ def chat(req: QueryRequest):
                     lista = "\n".join([f"- {n} ({u}), rol: {r}" for n, u, r in resultado])
                     return {"respuesta": f"Usuarios registrados:\n{lista}", "chat_history": req.chat_history or []}
                 return {"respuesta": "No hay usuarios registrados.", "chat_history": req.chat_history or []}
-            # Mesa de partes puede ver TODOS los trámites internos y externos:
             if "tramites internos" in pregunta_lower and not any(palabra in pregunta_lower for palabra in ["estado", "estados"]):
                 sql = "SELECT COUNT(*) FROM tramites_internos;"
                 resultado = consulta_sql(sql)
@@ -399,7 +377,6 @@ def chat(req: QueryRequest):
 
         # --- CONSULTAS RESTRINGIDAS a su área para otros roles ---
         if req.usar_bd and not es_mesa_partes(usuario):
-            # Trámites internos en su área (como jefe, auxiliar, etc.)
             if "tramites internos" in pregunta_lower and not any(palabra in pregunta_lower for palabra in ["estado", "estados"]):
                 sql = "SELECT COUNT(*) FROM tramites_internos WHERE area_destino_id = %s;"
                 resultado = consulta_sql(sql, (area_id,))
@@ -410,11 +387,10 @@ def chat(req: QueryRequest):
                 resultado = consulta_sql(sql, (area_id,))
                 total = resultado[0][0] if resultado else 0
                 return {"respuesta": f"En tu área hay {total} trámites externos actualmente.", "chat_history": req.chat_history or []}
-            # No puede ver usuarios ni áreas, responde acceso denegado
             if "usuarios" in pregunta_lower or "areas" in pregunta_lower:
                 return {"respuesta": "No tienes autorización para consultar usuarios o áreas. Solo mesa de partes o admin puede hacerlo.", "chat_history": req.chat_history or []}
 
-        # --- CONSULTAS SIEMPRE PERSONALES (para todos los roles) ---
+        # --- CONSULTAS PARA TODOS LOS PERSONALES ---
         if req.usar_bd and (
             "mis tramites internos" in pregunta_lower or "mis trámites internos" in pregunta_lower
         ) and not any(palabra in pregunta_lower for palabra in ["estado", "estados"]):
