@@ -14,7 +14,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        {/* Ruta pública para el registro de trámite externo */}
+        {/* rutass públicas */}
         <Route path="/registrar-tramite" element={<RegistrarTramite />} />
         <Route path="/buscar-tramite" element={<BuscarTramite />} />
         {/* Rutas privadas */}
@@ -26,7 +26,6 @@ export default function App() {
             </PrivateRoute>
           }
         />
-        {/* Redirecciona cualquier otra ruta a Home */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
