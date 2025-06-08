@@ -1,5 +1,4 @@
-// RUTA: src/pages/TramitesExternos.jsx
-// Lista de trámites externos con botón "Derivar" (que abre formulario/modal), usando áreas reales de la base de datos.
+//src/pages/TramitesExternos.jsx
 
 import { useEffect, useState, useRef } from "react";
 import {
@@ -45,13 +44,15 @@ export default function TramitesExternos({ usuarioLogueado }) {
     const [pdfRespuesta, setPdfRespuesta] = useState(null);
     const [pdfUrl, setPdfUrl] = useState("");
     const [success, setSuccess] = useState("");
-    const [areas, setAreas] = useState([]); // Áreas reales desde la BD
+    const [areas, setAreas] = useState([]);
     const [areaDerivar, setAreaDerivar] = useState("");
     const [successDerivar, setSuccessDerivar] = useState("");
     const [errorDerivar, setErrorDerivar] = useState("");
     const fileInputRef = useRef(null);
+    const [estadoFiltro, setEstadoFiltro] = useState("");
+    const [busqueda, setBusqueda] = useState("");
 
-    // Cargar trámites del backend
+    //cargar trámites del backend
     const fetchTramites = async () => {
         setLoading(true);
         setError("");
@@ -73,13 +74,11 @@ export default function TramitesExternos({ usuarioLogueado }) {
         setLoading(false);
     };
 
-    // Cargar áreas reales desde backend
     const fetchAreas = async () => {
         try {
             const url = `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/areas`;
             const res = await fetch(url);
             const data = await res.json();
-            // El endpoint devuelve { mensaje, total, areas }
             setAreas(data.areas || []);
         } catch {
             setAreas([]);
@@ -91,7 +90,23 @@ export default function TramitesExternos({ usuarioLogueado }) {
         fetchAreas();
     }, []);
 
-    // Exportar a Excel (igual que antes)
+    const tramitesFiltrados = tramites
+        .filter(t =>
+            !estadoFiltro || t.estado === estadoFiltro
+        )
+        .filter(t => {
+            if (!busqueda.trim()) return true;
+            const b = busqueda.trim().toLowerCase();
+            return (
+                t.numero_expediente?.toLowerCase().includes(b) ||
+                t.remitente?.toLowerCase().includes(b) ||
+                t.asunto?.toLowerCase().includes(b) ||
+                t.tipo_documento?.toLowerCase().includes(b) ||
+                t.dni_ruc?.toLowerCase().includes(b) ||
+                t.email?.toLowerCase().includes(b)
+            );
+        });
+
     const exportarExcel = () => {
         const encabezados = [
             "ID", "Nº Expediente", "Remitente", "Asunto", "Tipo Doc.", "Estado", "Fecha Registro",
@@ -124,7 +139,6 @@ export default function TramitesExternos({ usuarioLogueado }) {
         XLSX.writeFile(wb, "reporte_tramites_externos.xlsx");
     };
 
-    // Abrir modal detalle
     const abrirDetalle = (t) => {
         setTramiteSel(t);
         setEstado(t.estado);
@@ -136,7 +150,6 @@ export default function TramitesExternos({ usuarioLogueado }) {
         setError("");
     };
 
-    // Abrir modal derivar
     const abrirDerivar = (t) => {
         setTramiteSel(t);
         setAreaDerivar("");
@@ -145,7 +158,6 @@ export default function TramitesExternos({ usuarioLogueado }) {
         setErrorDerivar("");
     };
 
-    // Enviar derivación al backend
     const derivarTramite = async (e) => {
         e.preventDefault();
         setErrorDerivar("");
@@ -243,6 +255,27 @@ export default function TramitesExternos({ usuarioLogueado }) {
                 <button onClick={exportarExcel} style={{ background: "#27ae60", color: "#fff" }}>
                     <FaFileExcel /> Exportar Excel
                 </button>
+                {/*filtro por estado */}
+                <select
+                    value={estadoFiltro}
+                    onChange={e => setEstadoFiltro(e.target.value)}
+                    style={{ marginLeft: 16, padding: "5px 12px" }}
+                >
+                    <option value="">Todos los estados</option>
+                    {ESTADOS.map(est => (
+                        <option key={est} value={est}>
+                            {est.charAt(0).toUpperCase() + est.slice(1)}
+                        </option>
+                    ))}
+                </select>
+                {/* búsqueda texto */}
+                <input
+                    type="text"
+                    placeholder="Buscar trámite..."
+                    value={busqueda}
+                    onChange={e => setBusqueda(e.target.value)}
+                    style={{ marginLeft: 16, padding: "5px 12px", minWidth: 180 }}
+                />
             </div>
             {loading ? (
                 <div className="loading">Cargando trámites...</div>
@@ -252,7 +285,7 @@ export default function TramitesExternos({ usuarioLogueado }) {
                 <table className="tabla-tramites-externos">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>N°</th>
                             <th>Nº Expediente</th>
                             <th>Remitente</th>
                             <th>Asunto</th>
@@ -264,14 +297,14 @@ export default function TramitesExternos({ usuarioLogueado }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {tramites.length === 0 ? (
+                        {tramitesFiltrados.length === 0 ? (
                             <tr>
                                 <td colSpan={9}>No hay trámites que mostrar.</td>
                             </tr>
                         ) : (
-                            tramites.map(t => (
+                            tramitesFiltrados.map((t, idx) => (
                                 <tr key={t.id}>
-                                    <td>{t.id}</td>
+                                    <td>{idx + 1}</td>
                                     <td>{t.numero_expediente}</td>
                                     <td>{t.remitente}</td>
                                     <td>{t.asunto}</td>
