@@ -39,10 +39,11 @@ export default function Login() {
         <div className="login-bg">
             <BarraSuperior mostrarBoton={false} />
             <div className="login-container">
-                <h2>
-                    <FaUserCircle style={{ fontSize: "2.2rem", marginBottom: "-6px", marginRight: "7px" }} />
-                    INICIAR SESIÓN
-                </h2>
+                <div className="login-header">
+                    <FaUserCircle className="login-icon" />
+                    <h2>INICIAR SESIÓN</h2>
+                    <p className="login-subtitle">Sistema Municipal</p>
+                </div>
                 <form onSubmit={handleSubmit}>
                     <div className="login-field">
                         <label>Correo o usuario</label>
@@ -77,7 +78,6 @@ export default function Login() {
                                 tabIndex={0}
                                 aria-label={verPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                                 title={verPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                                style={{ cursor: "pointer" }}
                             >
                                 {verPassword ? <FaEye /> : <FaEyeSlash />}
                             </span>
