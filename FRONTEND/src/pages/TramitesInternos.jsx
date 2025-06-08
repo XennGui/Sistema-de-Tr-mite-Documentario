@@ -1,4 +1,5 @@
 // src/pages/TramitesInternos.jsx
+
 import { useEffect, useState, useRef } from "react";
 import { FaSync, FaEye, FaCheck, FaReply, FaShareSquare, FaFilePdf, FaCloudUploadAlt, FaPlusCircle } from "react-icons/fa";
 import "../styles/TramitesInternos.css";
@@ -49,15 +50,16 @@ export default function TramitesInternos({ usuarioLogueado }) {
     const [areaDerivar, setAreaDerivar] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
+    const [estadoFiltro, setEstadoFiltro] = useState(""); 
+    const [busqueda, setBusqueda] = useState(""); 
     const fileInputRef = useRef(null);
     const fileInputFormRef = useRef(null);
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-    // Cargar trámites y áreas
+    //cargar trámites y áreas
     useEffect(() => {
         fetchTramites();
         fetchAreas();
-        // eslint-disable-next-line
     }, []);
 
     const fetchTramites = async () => {
@@ -99,7 +101,7 @@ export default function TramitesInternos({ usuarioLogueado }) {
         }
     };
 
-    // Crear trámite interno
+    //crear trámite interno
     const handleFormChange = e => {
         const { name, value, files } = e.target;
         if (name === "archivo") {
@@ -146,21 +148,18 @@ export default function TramitesInternos({ usuarioLogueado }) {
         setLoading(false);
     };
 
-    // Abrir detalle y seguimiento
     const abrirDetalle = (t) => {
         setTramiteSel(t);
         setModal(true);
         fetchSeguimiento(t.id);
     };
 
-    // Abrir derivar
     const abrirDerivar = (t) => {
         setTramiteSel(t);
         setAreaDerivar("");
         setModalDerivar(true);
     };
 
-    // Abrir contestar
     const abrirContestar = (t) => {
         setTramiteSel(t);
         setRespuesta("");
@@ -168,7 +167,6 @@ export default function TramitesInternos({ usuarioLogueado }) {
         setModalContestar(true);
     };
 
-    // Derivar trámite
     const derivarTramite = async (e) => {
         e.preventDefault();
         setErrorMsg("");
@@ -225,7 +223,6 @@ export default function TramitesInternos({ usuarioLogueado }) {
         setLoading(false);
     };
 
-    // Contestar trámite
     const contestarTramite = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -254,7 +251,6 @@ export default function TramitesInternos({ usuarioLogueado }) {
         setLoading(false);
     };
 
-    // Visualizar PDF en modal (no en otra pestaña)
     const verPDF = (ruta) => {
         if (!ruta) return;
         let url = ruta;
@@ -267,15 +263,29 @@ export default function TramitesInternos({ usuarioLogueado }) {
         setModalPDF({ mostrar: true, url });
     };
 
-    // Función auxiliar para mostrar nombre de área
     const nombreArea = (area_id) => {
         const area = areas.find(a => a.id === area_id);
         return area ? area.nombre : area_id;
     };
 
-    // Lógica para mostrar botón "Recibir"
     const puedeRecibir = (t) =>
         t.estado === "derivado" && usuarioLogueado.area_id === t.area_destino_id;
+
+    const tramitesFiltrados = tramites
+        .filter(t =>
+            !estadoFiltro || t.estado === estadoFiltro
+        )
+        .filter(t => {
+            if (!busqueda.trim()) return true;
+            const b = busqueda.trim().toLowerCase();
+            return (
+                t.numero_referencia?.toLowerCase().includes(b) ||
+                t.asunto?.toLowerCase().includes(b) ||
+                nombreArea(t.area_origen_id)?.toLowerCase().includes(b) ||
+                nombreArea(t.area_destino_id)?.toLowerCase().includes(b) ||
+                t.estado?.toLowerCase().includes(b)
+            );
+        });
 
     return (
         <div className="tramites-internos-page">
@@ -285,6 +295,27 @@ export default function TramitesInternos({ usuarioLogueado }) {
                     <FaPlusCircle /> {formVisible ? "Cancelar" : "Nuevo Trámite Interno"}
                 </button>
                 <button className="btn-crear" onClick={fetchTramites}><FaSync /> Refrescar</button>
+
+                <select
+                    value={estadoFiltro}
+                    onChange={e => setEstadoFiltro(e.target.value)}
+                    style={{ marginLeft: 16, padding: "5px 12px" }}
+                >
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="derivado">Derivado</option>
+                    <option value="recibido">Recibido</option>
+                    <option value="atendido">Atendido</option>
+                    <option value="archivado">Archivado</option>
+                </select>
+
+                <input
+                    type="text"
+                    placeholder="Buscar trámite..."
+                    value={busqueda}
+                    onChange={e => setBusqueda(e.target.value)}
+                    style={{ marginLeft: 16, padding: "5px 12px", minWidth: 180 }}
+                />
             </div>
             {formVisible && (
                 <form className="form-tramite-interno" onSubmit={handleSubmit}>
@@ -345,12 +376,12 @@ export default function TramitesInternos({ usuarioLogueado }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {tramites.length === 0 ? (
+                        {tramitesFiltrados.length === 0 ? (
                             <tr>
                                 <td colSpan={9}>No hay trámites internos.</td>
                             </tr>
                         ) : (
-                            tramites.map((t, idx) => (
+                            tramitesFiltrados.map((t, idx) => (
                                 <tr key={t.id}>
                                     <td>{idx + 1}</td>
                                     <td>{t.numero_referencia}</td>
@@ -464,8 +495,8 @@ export default function TramitesInternos({ usuarioLogueado }) {
                                 {areas
                                     .filter(a => a.id !== tramiteSel.area_destino_id)
                                     .map(a => (
-                                    <option value={a.id} key={a.id}>{a.nombre}</option>
-                                ))}
+                                        <option value={a.id} key={a.id}>{a.nombre}</option>
+                                    ))}
                             </select>
                             <button className="btn-modal" style={{ background: "#ffa726", color: "#1a237e" }}
                                 type="submit" disabled={loading || !areaDerivar}>
@@ -480,6 +511,7 @@ export default function TramitesInternos({ usuarioLogueado }) {
                     </div>
                 </div>
             )}
+            
             {/* MODAL CONTESTAR */}
             {modalContestar && tramiteSel && (
                 <div className="modal-bg">
