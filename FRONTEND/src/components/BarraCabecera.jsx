@@ -22,14 +22,12 @@ export default function BarraCabecera() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    //si no hay usuario, redirige al login
     useEffect(() => {
         if (!usuario || !usuario.nombre || !usuario.rol) {
             navigate("/login", { replace: true });
         }
     }, [usuario, navigate]);
 
-    // No mostrar la barra en /login
     if (location.pathname === "/login") return null;
 
     useEffect(() => {
@@ -76,8 +74,9 @@ export default function BarraCabecera() {
                 <FaBuilding style={{ marginRight: "12px", fontSize: "2rem" }} />
                 Municipalidad de Yau
             </div>
+            {/* CHATBOT EN EL CENTRO DE LA CABECERA */}
             <div className="cabecera-chatbot-central">
-                <ChatbotMunicipal placement="center" />
+                <ChatbotMunicipal />
             </div>
             <div className="cabecera-usuario" ref={menuRef}>
                 <button

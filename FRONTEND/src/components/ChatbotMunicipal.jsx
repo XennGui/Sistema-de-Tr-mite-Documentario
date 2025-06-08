@@ -16,10 +16,11 @@ export default function ChatbotMunicipal({ placement = "center" }) {
     const [entrenando, setEntrenando] = useState(false);
     const [pdfIdActual, setPdfIdActual] = useState(null);
     const [tramiteSelectorOpen, setTramiteSelectorOpen] = useState(false);
-    const [pdfPendiente, setPdfPendiente] = useState(null); // Nuevo: PDF seleccionado pendiente de enviar
+    const [pdfPendiente, setPdfPendiente] = useState(null); 
 
     const chatEndRef = useRef(null);
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+    
     const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
 
     useEffect(() => {
@@ -51,12 +52,10 @@ export default function ChatbotMunicipal({ placement = "center" }) {
         setTimeout(() => setMsgBot(""), 2500);
     };
 
-    // Manejo del envío: si hay pdfPendiente, lo sube, si no, pregunta normal
     const enviarPregunta = async (e) => {
         e.preventDefault();
         if (loading || entrenando) return;
         if (pdfPendiente) {
-            // Subir PDF al chat como mensaje del usuario
             setChat(prev => [
                 ...prev,
                 {
@@ -68,7 +67,7 @@ export default function ChatbotMunicipal({ placement = "center" }) {
             ]);
             setPdfIdActual(pdfPendiente.tramiteId);
             setPdfPendiente(null);
-            setPregunta(""); // limpia input
+            setPregunta(""); 
         } else if (pregunta.trim()) {
             setMsgBot("");
             setChat(prev => [...prev, { pregunta, respuesta: "..." }]);
@@ -117,7 +116,7 @@ export default function ChatbotMunicipal({ placement = "center" }) {
 
     const placementStyle = placement === "center"
         ? { position: "fixed", left: "50%", top: "10vh", transform: "translateX(-50%)", zIndex: 2001 }
-        : { position: "fixed", right: "32px", bottom: "100px", zIndex: 2001 };
+        : { position: "fixed", right: "32px", bottom: "800px", zIndex: 2001, top: "50"};
 
     return (
         <>
@@ -125,8 +124,8 @@ export default function ChatbotMunicipal({ placement = "center" }) {
                 className={placement === "center" ? "chatbot-btn-center" : "chatbot-fab"}
                 onClick={() => setOpen(true)}
             >
-                <FaRobot size={26} />
-                {placement === "center" && <span style={{ marginLeft: 10, fontWeight: 600 }}>Asistente IA</span>}
+                <FaRobot size={40} />
+                {placement === "center" && <span style={{ marginLeft: 10, fontWeight: 900 }}>Asistente IA</span>}
             </button>
             {open && (
                 <div className="chatbot-modal-bg" style={{ ...placementStyle }} onClick={() => setOpen(false)}>
@@ -168,7 +167,6 @@ export default function ChatbotMunicipal({ placement = "center" }) {
                             )}
                             <div ref={chatEndRef}></div>
                         </div>
-                        {/* Barra inferior alineada */}
                         <div className="chatbot-modal-bottombar">
                             <label
                                 className="pdf-clip-btn"
@@ -222,7 +220,7 @@ export default function ChatbotMunicipal({ placement = "center" }) {
                                 </button>
                             </form>
                         </div>
-                        {/* Selector de trámite y PDF, solo cuando Consulta BD está activa */}
+                        {/*selector de trámite y PDF, solo cuando Consulta BD está activa */}
                         <TramitePdfSelector
                             open={tramiteSelectorOpen}
                             onClose={() => setTramiteSelectorOpen(false)}

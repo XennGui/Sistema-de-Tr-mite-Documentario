@@ -9,11 +9,11 @@ export default function TramitePdfSelector({
     usuario,
     onSelectPdf
 }) {
-    const [tipo, setTipo] = useState(null); // 'interno' | 'externo'
+    const [tipo, setTipo] = useState(null); 
     const [tramites, setTramites] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // Carga trámites según tipo y área
+    //carga trámites según tipo y área
     useEffect(() => {
         if (!tipo || !open) return;
         setLoading(true);
