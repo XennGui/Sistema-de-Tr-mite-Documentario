@@ -154,12 +154,12 @@ export default function RegistrarTramite() {
     if (mensaje) {
         return (
             <div className="tramite-exito">
-                <h2><FaRegFileAlt style={{verticalAlign: "middle"}} /> {mensaje}</h2>
+                <h2><FaRegFileAlt style={{ verticalAlign: "middle" }} /> {mensaje}</h2>
                 <p>
                     Puede descargar su cargo en formato PDF, así mismo puede hacer su seguimiento de sus trámites a través de esta plataforma simplemente ingresando el número de expediente y su código de seguridad.
                 </p>
                 <button className="registrar-tramite-btn" onClick={handleImprimirCargo}>
-                    <FaFilePdf style={{verticalAlign: "middle"}} /> Imprimir cargo PDF
+                    <FaFilePdf style={{ verticalAlign: "middle" }} /> Imprimir cargo PDF
                 </button>
                 <button className="registrar-tramite-btn" onClick={() => navigate("/")}>Volver al inicio</button>
             </div>
@@ -167,71 +167,73 @@ export default function RegistrarTramite() {
     }
 
     return (
-        <div className="registrar-tramite-contenedor-horizontal">
-            <div className="registrar-tramite-header">
-                <img src={logo} alt="Logo Municipalidad de Yau" style={{width: 46, height: 46, marginRight: 12}} />
-                <h2>Registrar Trámite Externo</h2>
+        <div className="registrar-tramite-bg">
+            <div className="registrar-tramite-contenedor-horizontal">
+                <div className="registrar-tramite-header">
+                    <img src={logo} alt="Logo Municipalidad de Yau" style={{ width: 46, height: 46, marginRight: 12 }} />
+                    <h2>Registrar Trámite Externo</h2>
+                </div>
+                <form
+                    className="registrar-tramite-form-horizontal"
+                    onSubmit={handleSubmit}
+                    encType="multipart/form-data"
+                >
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label><FaUser className="form-icon" /> Remitente*:</label>
+                            <input name="remitente" value={form.remitente} onChange={handleChange} required maxLength={200} />
+                        </div>
+                        <div className="form-group">
+                            <label><FaFileAlt className="form-icon" /> Tipo de documento*:</label>
+                            <input name="tipo_documento" value={form.tipo_documento} onChange={handleChange} required maxLength={50} placeholder="Ej: Carta, Oficio" />
+                        </div>
+                        <div className="form-group">
+                            <label><FaFileAlt className="form-icon" /> Folios*:</label>
+                            <input name="folios" type="number" min={1} value={form.folios} onChange={handleChange} required />
+                        </div>
+                    </div>
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label><FaFileAlt className="form-icon" /> Asunto*:</label>
+                            <input name="asunto" value={form.asunto} onChange={handleChange} required maxLength={255} />
+                        </div>
+                        <div className="form-group">
+                            <label><FaFileAlt className="form-icon" /> Contenido:</label>
+                            <textarea name="contenido" value={form.contenido} onChange={handleChange} rows={2} maxLength={800} />
+                        </div>
+                        <div className="form-group">
+                            <label><FaFileUpload className="form-icon" /> Archivo PDF:</label>
+                            <input name="archivo" type="file" accept=".pdf" onChange={handleChange} />
+                        </div>
+                    </div>
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label><FaUser className="form-icon" /> Tipo de Persona*:</label>
+                            <select name="tipo_persona" value={form.tipo_persona} onChange={handleChange} required>
+                                <option value="natural">Natural</option>
+                                <option value="juridica">Jurídica</option>
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label><FaIdCard className="form-icon" /> DNI/RUC*:</label>
+                            <input name="dni_ruc" value={form.dni_ruc} onChange={handleChange} required maxLength={20} />
+                        </div>
+                        <div className="form-group">
+                            <label><FaEnvelope className="form-icon" /> Correo electrónico*:</label>
+                            <input name="email" type="email" value={form.email} onChange={handleChange} required maxLength={100} />
+                        </div>
+                        <div className="form-group">
+                            <label><FaPhone className="form-icon" /> Teléfono:</label>
+                            <input name="telefono" value={form.telefono} onChange={handleChange} maxLength={20} />
+                        </div>
+                    </div>
+                    {error && <div className="registrar-tramite-error">{error}</div>}
+                    <div className="registrar-tramite-botones">
+                        <button className="registrar-tramite-btn" type="submit">Registrar</button>
+                        <button className="registrar-tramite-btn" type="button" onClick={() => navigate("/")}>Cancelar</button>
+                    </div>
+                </form>
             </div>
-            <form
-                className="registrar-tramite-form-horizontal"
-                onSubmit={handleSubmit}
-                encType="multipart/form-data"
-            >
-                <div className="form-row">
-                    <div className="form-group">
-                        <label><FaUser className="form-icon" /> Remitente*:</label>
-                        <input name="remitente" value={form.remitente} onChange={handleChange} required maxLength={200} />
-                    </div>
-                    <div className="form-group">
-                        <label><FaFileAlt className="form-icon" /> Tipo de documento*:</label>
-                        <input name="tipo_documento" value={form.tipo_documento} onChange={handleChange} required maxLength={50} placeholder="Ej: Carta, Oficio" />
-                    </div>
-                    <div className="form-group">
-                        <label><FaFileAlt className="form-icon" /> Folios*:</label>
-                        <input name="folios" type="number" min={1} value={form.folios} onChange={handleChange} required />
-                    </div>
-                </div>
-                <div className="form-row">
-                    <div className="form-group">
-                        <label><FaFileAlt className="form-icon" /> Asunto*:</label>
-                        <input name="asunto" value={form.asunto} onChange={handleChange} required maxLength={255} />
-                    </div>
-                    <div className="form-group">
-                        <label><FaFileAlt className="form-icon" /> Contenido:</label>
-                        <textarea name="contenido" value={form.contenido} onChange={handleChange} rows={2} maxLength={800} />
-                    </div>
-                    <div className="form-group">
-                        <label><FaFileUpload className="form-icon" /> Archivo PDF:</label>
-                        <input name="archivo" type="file" accept=".pdf" onChange={handleChange} />
-                    </div>
-                </div>
-                <div className="form-row">
-                    <div className="form-group">
-                        <label><FaUser className="form-icon" /> Tipo de Persona*:</label>
-                        <select name="tipo_persona" value={form.tipo_persona} onChange={handleChange} required>
-                            <option value="natural">Natural</option>
-                            <option value="juridica">Jurídica</option>
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label><FaIdCard className="form-icon" /> DNI/RUC*:</label>
-                        <input name="dni_ruc" value={form.dni_ruc} onChange={handleChange} required maxLength={20} />
-                    </div>
-                    <div className="form-group">
-                        <label><FaEnvelope className="form-icon" /> Correo electrónico*:</label>
-                        <input name="email" type="email" value={form.email} onChange={handleChange} required maxLength={100} />
-                    </div>
-                    <div className="form-group">
-                        <label><FaPhone className="form-icon" /> Teléfono:</label>
-                        <input name="telefono" value={form.telefono} onChange={handleChange} maxLength={20} />
-                    </div>
-                </div>
-                {error && <div className="registrar-tramite-error">{error}</div>}
-                <div className="registrar-tramite-botones">
-                    <button className="registrar-tramite-btn" type="submit">Registrar</button>
-                    <button className="registrar-tramite-btn" type="button" onClick={() => navigate("/")}>Cancelar</button>
-                </div>
-            </form>
         </div>
     );
 }

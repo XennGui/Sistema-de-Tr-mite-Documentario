@@ -48,13 +48,14 @@ export default function DashboardInicio({ usuario }) {
                     extEstados.archivado
                 ],
                 backgroundColor: [
-                    "#FFB347", // pendiente
-                    "#4BC0C0", // atendido
-                    "#FF6384", // denegado
-                    "#36A2EB", // derivado
-                    "#AAAAAA"  // archivado
+                    "#FFA500", // pendiente - naranja brillante
+                    "#00CED1", // atendido - turquesa
+                    "#FF4500", // denegado - rojo anaranjado
+                    "#1E90FF", // derivado - azul dodger
+                    "#808080"  // archivado - gris
                 ],
-                borderWidth: 1,
+                borderColor: "#000000",
+                borderWidth: 2,
             }
         ]
     };
@@ -72,13 +73,14 @@ export default function DashboardInicio({ usuario }) {
                     intEstados.archivado
                 ],
                 backgroundColor: [
-                    "#FFB347", // pendiente
-                    "#8bc34a", // recibido
-                    "#4BC0C0", // atendido
-                    "#36A2EB", // derivado
-                    "#AAAAAA"  // archivado
+                    "#FFA500", // pendiente - naranja brillante
+                    "#32CD32", // recibido - verde lima
+                    "#00CED1", // atendido - turquesa
+                    "#1E90FF", // derivado - azul dodger
+                    "#808080"  // archivado - gris
                 ],
-                borderWidth: 1,
+                borderColor: "#000000",
+                borderWidth: 2,
             }
         ]
     };
@@ -127,7 +129,13 @@ export default function DashboardInicio({ usuario }) {
                             data={dataPieExt}
                             options={{
                                 plugins: { legend: { display: false } },
-                                maintainAspectRatio: false
+                                maintainAspectRatio: false,
+                                elements: {
+                                    arc: {
+                                        borderWidth: 2,
+                                        borderColor: '#000'
+                                    }
+                                }
                             }}
                             width={260}
                             height={260}
@@ -138,7 +146,10 @@ export default function DashboardInicio({ usuario }) {
                             <span key={lbl}>
                                 <span
                                     className="leyenda-color"
-                                    style={{ background: dataPieExt.datasets[0].backgroundColor[i] }}
+                                    style={{ 
+                                        background: dataPieExt.datasets[0].backgroundColor[i],
+                                        border: "2px solid #000"
+                                    }}
                                 ></span>
                                 {lbl} ({dataPieExt.datasets[0].data[i]})
                             </span>
@@ -152,7 +163,13 @@ export default function DashboardInicio({ usuario }) {
                             data={dataPieInt}
                             options={{
                                 plugins: { legend: { display: false } },
-                                maintainAspectRatio: false
+                                maintainAspectRatio: false,
+                                elements: {
+                                    arc: {
+                                        borderWidth: 2,
+                                        borderColor: '#000'
+                                    }
+                                }
                             }}
                             width={260}
                             height={260}
@@ -163,7 +180,10 @@ export default function DashboardInicio({ usuario }) {
                             <span key={lbl}>
                                 <span
                                     className="leyenda-color"
-                                    style={{ background: dataPieInt.datasets[0].backgroundColor[i] }}
+                                    style={{ 
+                                        background: dataPieInt.datasets[0].backgroundColor[i],
+                                        border: "2px solid #000"
+                                    }}
                                 ></span>
                                 {lbl} ({dataPieInt.datasets[0].data[i]})
                             </span>

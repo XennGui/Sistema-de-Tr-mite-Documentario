@@ -2,13 +2,13 @@
 
 .dashboard-inicio {
     width: 100%;
-    padding: 0 1rem 1rem 1rem;
+    padding: 0 0rem 0rem 0rem;
 }
 
 .dashboard-cajas-row {
     display: flex;
-    gap: 2rem;
-    margin-bottom: 2.6rem;
+    gap: 1rem;
+    margin-bottom: 1.0rem;
     justify-content: flex-start;
     flex-wrap: wrap;
 }
@@ -16,70 +16,74 @@
 .dashboard-caja {
     display: flex;
     align-items: center;
-    background: #f5f6fa;
-    border-radius: 18px;
-    box-shadow: 0 2px 16px 0 #e0e7ef;
-    padding: 1.1rem 2rem;
-    min-width: 180px;
-    max-width: 220px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 2px solid #000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 1.0rem 2rem;
+    min-width: 200px;
+    max-width: 240px;
     flex: 1 0 0;
-    gap: 1.1rem;
-    transition: transform 0.13s;
+    gap: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .dashboard-caja:hover {
     transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .dashboard-caja-icon {
-    font-size: 2rem;
+    font-size: 2.2rem;
     color: #0a457c;
     margin-right: 6px;
 }
 
 .info-areas .dashboard-caja-icon {
-    color: #4caf50;
+    color: #2E8B57;
 }
 
 .info-usuarios .dashboard-caja-icon {
-    color: #2196f3;
+    color: #1E90FF;
 }
 
 .info-ext .dashboard-caja-icon {
-    color: #ff9800;
+    color: #FF8C00;
 }
 
 .info-int .dashboard-caja-icon {
-    color: #4bc0c0;
+    color: #20B2AA;
 }
 
 .dashboard-caja-titulo {
-    font-size: 1.05rem;
-    color: #888;
-    margin-bottom: 0.08rem;
+    font-size: 1.1rem;
+    color: #000;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
 }
 
 .dashboard-caja-num {
-    font-size: 1.3rem;
-    color: #0a457c;
+    font-size: 1.5rem;
+    color: #000;
     font-weight: bold;
 }
 
-/* para gráficos: ocupa todo el ancho y centrados */
 .dashboard-graficos-superrow {
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: flex-start;
     gap: 4rem;
-    margin-top: 1.5rem;
+    margin-top: 0.8rem;
+    flex-wrap: wrap;
 }
 
 .dashboard-grafico-card2 {
     background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 2px 16px 0 #e0e7ef;
-    padding: 1.3rem 1.5rem 1.1rem 1.5rem;
+    border-radius: 12px;
+    border: 2px solid #000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 1rem 1rem 1rem 1rem;
     flex: 1 1 0;
     min-width: 400px;
     max-width: 650px;
@@ -87,18 +91,22 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    margin-bottom: 2rem;
 }
 
 .dashboard-grafico-titulo {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #0a457c;
-    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .grafico-pie-wrapper2 {
-    width: 260px;
-    height: 260px;
+    width: 280px;
+    height: 280px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -108,26 +116,33 @@
 .dashboard-grafico-leyenda {
     display: flex;
     flex-direction: row;
-    gap: 1.1rem;
-    margin-top: 1rem;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
     flex-wrap: wrap;
-    font-size: 0.99rem;
+    font-size: 1rem;
     justify-content: center;
+    font-weight: 600;
 }
 
 .leyenda-color {
     display: inline-block;
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    margin-right: 4px;
+    margin-right: 6px;
     vertical-align: middle;
-    border: 2px solid #eee;
+    border: 2px solid #000 !important;
 }
 
 .dashboard-error {
-    color: #c00;
+    color: #FF0000;
     text-align: center;
     padding: 2rem;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border: 2px solid #000;
+    background-color: #fff;
+    border-radius: 8px;
+    margin: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

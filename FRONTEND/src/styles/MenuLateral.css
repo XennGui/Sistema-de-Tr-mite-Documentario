@@ -1,44 +1,110 @@
 /* src/styles/MenuLateral.css */
+/* src/styles/MenuLateral.css */
 
 .menu-lateral {
-    background: #e6effa;
-    min-width: 230px;
-    padding-top: 2rem;
-    border-top-right-radius: 17px;
-    border-bottom-right-radius: 17px;
-    box-shadow: 2px 0 8px #e0e7ef;
-    min-height: calc(100vh - 70px);
+    background: linear-gradient(180deg, #a3b0ba 0%, #f3f6fb 100%);
+    min-width: 260px;
+    padding: 2rem 0;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.03);
+    border-right: 1px solid #e1e8f0;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.menu-lateral:hover {
+    box-shadow: 8px 0 25px rgba(0, 0, 0, 0.05);
 }
 
 .menu-lateral ul {
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .menu-lateral li {
     display: flex;
     align-items: center;
-    gap: 1.3rem;
-    padding: 1.15rem 2rem;
-    font-size: 1.13rem;
-    color: #0a457c;
+    gap: 1.5rem;
+    padding: 1.2rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #000000;
     cursor: pointer;
-    border-left: 4px solid transparent;
-    transition: background 0.16s, border 0.16s, color 0.16s;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    
+    overflow: hidden;
 }
 
-.menu-lateral li:hover,
+.menu-lateral li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.menu-lateral li:hover {
+    background: rgba(7, 7, 8, 0.08);
+    color: #0a9496;
+}
+
+.menu-lateral li:hover::before {
+    background: #1a73e8;
+}
+
+.menu-lateral li:hover .icono-menu {
+    transform: scale(1.1);
+}
+
 .menu-lateral li.activo {
-    background: #c3defb;
-    border-left: 4px solid #0a457c;
-    color: #08325b;
-    font-weight: 600;
+    background: rgba(255, 255, 255, 0.871);
+    color: #1a73e8;
+}
+
+.menu-lateral li.activo::before {
+    background: #1a73e8;
+}
+
+.menu-lateral li.activo .icono-menu {
+    transform: scale(1.1);
 }
 
 .icono-menu {
-    font-size: 1.3rem;
+    font-size: 2.4rem;
     display: flex;
     align-items: center;
-    margin-right: 2px;
+    transition: all 0.3s ease;
+    min-width: 30px;
 }
+
+/* Colores personalizados para cada ícono */
+.menu-lateral li:nth-child(1) .icono-menu { color: #0f02c4; } /* Inicio */
+.menu-lateral li:nth-child(2) .icono-menu { color: #b95d07; } /* Áreas */
+.menu-lateral li:nth-child(3) .icono-menu { color: #039740; } /* Usuarios */
+.menu-lateral li:nth-child(4) .icono-menu { color: #930806; } /* Trámites Externos */
+.menu-lateral li:nth-child(5) .icono-menu { color: #4f0981; } /* Trámites Internos */
+
+.menu-lateral li:hover:nth-child(1) .icono-menu,
+.menu-lateral li.activo:nth-child(1) .icono-menu { color: #3a56c8; }
+
+.menu-lateral li:hover:nth-child(2) .icono-menu,
+.menu-lateral li.activo:nth-child(2) .icono-menu { color: #d35400; }
+
+.menu-lateral li:hover:nth-child(3) .icono-menu,
+.menu-lateral li.activo:nth-child(3) .icono-menu { color: #27ae60; }
+
+.menu-lateral li:hover:nth-child(4) .icono-menu,
+.menu-lateral li.activo:nth-child(4) .icono-menu { color: #c0392b; }
+
+.menu-lateral li:hover:nth-child(5) .icono-menu,
+.menu-lateral li.activo:nth-child(5) .icono-menu { color: #8e44ad; }
