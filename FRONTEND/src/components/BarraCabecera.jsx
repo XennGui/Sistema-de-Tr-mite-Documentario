@@ -3,8 +3,8 @@
 import "../styles/BarraCabecera.css";
 import { FaUserCircle, FaBuilding, FaChevronDown, FaSignOutAlt } from "react-icons/fa";
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import ChatbotMunicipal from "./ChatbotMunicipal"; // <-- IMPORTA EL CHATBOT
+import { useNavigate, useLocation } from "react-router-dom";
+import ChatbotMunicipal from "./ChatbotMunicipal";
 
 const ROLES_OPTIONS = [
     { value: "admin", label: "Administrador" },
@@ -17,10 +17,20 @@ export default function BarraCabecera() {
     const [usuario, setUsuario] = useState(() =>
         JSON.parse(localStorage.getItem("usuario") || "{}")
     );
-
     const [menuAbierto, setMenuAbierto] = useState(false);
     const menuRef = useRef();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    //si no hay usuario, redirige al login
+    useEffect(() => {
+        if (!usuario || !usuario.nombre || !usuario.rol) {
+            navigate("/login", { replace: true });
+        }
+    }, [usuario, navigate]);
+
+    // No mostrar la barra en /login
+    if (location.pathname === "/login") return null;
 
     useEffect(() => {
         if (menuAbierto) {
@@ -56,7 +66,6 @@ export default function BarraCabecera() {
         navigate("/login", { replace: true });
     };
 
-    //busca el label del rol:
     const rolLegible = usuario.rol
         ? (ROLES_OPTIONS.find(r => r.value === usuario.rol)?.label || usuario.rol)
         : "";
@@ -67,12 +76,9 @@ export default function BarraCabecera() {
                 <FaBuilding style={{ marginRight: "12px", fontSize: "2rem" }} />
                 Municipalidad de Yau
             </div>
-
-            {/* Chatbot Municipal centrado en la cabecera */}
             <div className="cabecera-chatbot-central">
                 <ChatbotMunicipal placement="center" />
             </div>
-
             <div className="cabecera-usuario" ref={menuRef}>
                 <button
                     className="cabecera-usuario-btn"
