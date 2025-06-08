@@ -1,6 +1,7 @@
 // src/components/BarraSuperior.jsx
 
 import { useNavigate, useLocation } from "react-router-dom";
+import { FaUser, FaBuilding } from "react-icons/fa";
 import "../styles/BarraSuperior.css";
 
 export default function BarraSuperior({ mostrarBoton = true }) {
@@ -10,18 +11,18 @@ export default function BarraSuperior({ mostrarBoton = true }) {
     return (
         <nav className="barra-superior">
             <div className="contenido-barra">
-                <span
-                    className="titulo-barra"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => navigate("/")}
-                >
-                    Municipalidad de Yau
-                </span>
+                <div className="logo-titulo" onClick={() => navigate("/")}>
+                    <FaBuilding className="icono-municipio" />
+                    <span className="titulo-barra">
+                        Municipalidad de <span className="titulo-destacado">Yau</span>
+                    </span>
+                </div>
                 {mostrarBoton && location.pathname !== "/login" && (
                     <button
                         className="boton-login-barra"
                         onClick={() => navigate("/login")}
                     >
+                        <FaUser className="icono-usuario" />
                         Iniciar sesión
                     </button>
                 )}

@@ -1,39 +1,100 @@
 /* src/styles/BarraSuperior.css */
 
 .barra-superior {
-    background: #0a457c;
-    padding: 1rem 0;
-    box-shadow: 0 2px 8px #e0e5ef;
+    background: linear-gradient(135deg, #0a457c 0%, #0d2b4e 100%);
+    color: #fff;
+    padding: 0.8rem 2rem;
+    font-family: 'Segoe UI', 'Roboto', 'Oxygen', sans-serif;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1000;
+    border-bottom: 3px solid #d4af37;
 }
 
 .contenido-barra {
-    max-width: 900px;
-    margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.logo-titulo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.logo-titulo:hover {
+    transform: scale(1.02);
+}
+
+.icono-municipio {
+    font-size: 2.2rem;
+    color: #d4af37;
 }
 
 .titulo-barra {
-    color: #fff;
+    font-size: 1.8rem;
     font-weight: 700;
-    font-size: 1.7rem;
-    letter-spacing: 1.5px;
+    letter-spacing: 0.5px;
+    background: linear-gradient(to right, #ffffff, #f0f0f0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.titulo-destacado {
+    color: #d4af37;
+    -webkit-text-fill-color: #d4af37;
+    font-weight: 800;
 }
 
 .boton-login-barra {
-    background-color: #fff;
-    color: #0a457c;
-    border: 1.5px solid #0a457c;
-    border-radius: 6px;
-    padding: 0.5rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid #d4af37;
+    padding: 0.6rem 1.5rem;
+    border-radius: 30px;
+    font-size: 1.1rem;
     font-weight: 600;
-    font-size: 1rem;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
 }
 
 .boton-login-barra:hover {
-    background: #d7e6fa;
-    color: #08325b;
+    background: #d4af37;
+    color: #0a457c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.icono-usuario {
+    font-size: 1.1rem;
+}
+
+.boton-login-barra:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .barra-superior {
+        padding: 0.8rem 1rem;
+    }
+    
+    .titulo-barra {
+        font-size: 1.5rem;
+    }
+    
+    .boton-login-barra {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
 }
