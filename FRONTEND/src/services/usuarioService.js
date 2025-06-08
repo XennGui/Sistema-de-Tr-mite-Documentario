@@ -2,9 +2,6 @@
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-/**
- * se inicia sesión con username/email y password.
- */
 export async function loginUsuario(identificador, password) {
     try {
         const res = await fetch(`${API_URL}/usuarios/login`, {
@@ -29,7 +26,7 @@ export async function obtenerUsuarios() {
 }
 
 /**
- * @param {*} usuario {nombre, area_id, username, password, email, rol}
+ * @param {*} usuario 
  */
 export async function crearUsuario(usuario) {
     const res = await fetch(`${API_URL}/usuarios`, {
@@ -42,8 +39,8 @@ export async function crearUsuario(usuario) {
 }
 
 /**
- * @param {*} id ID del usuario
- * @param {*} usuario {nombre, area_id, username, password, email, rol}
+ * @param {*} id 
+ * @param {*} usuario 
  */
 export async function actualizarUsuario(id, usuario) {
     const res = await fetch(`${API_URL}/usuarios/${id}`, {
