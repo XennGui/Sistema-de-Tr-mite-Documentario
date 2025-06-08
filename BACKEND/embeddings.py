@@ -8,9 +8,8 @@ from typing import List
 import os
 import pickle
 
-# Define la ruta base del archivo actual para construir rutas relativas seguras
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# Define la ruta donde se guardará el índice vectorial FAISS serializado
+#define la ruta donde se guardará el índice vectorial FAISS serializado
 VECTORSTORE_PATH = os.path.join(BASE_DIR, "vectorstore", "faiss_index.pkl")
 
 def create_embeddings(docs: List[Document]):
@@ -24,18 +23,13 @@ def create_embeddings(docs: List[Document]):
     Returns:
         FAISS: Indice vectorial con embeddings y metadatos.
     """
-    # Inicializa el modelo de embeddings basado en transformers
     embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     
-    # Extrae el texto de cada documento para crear embeddings
     texts = [doc.page_content for doc in docs]
-    # Extrae los metadatos de cada documento para asociarlos en el indice
     metadatas = [doc.metadata for doc in docs]
 
-    # Crea un indice FAISS a partir de los textos y el modelo de embeddings
     vectorstore = FAISS.from_texts(texts, embedding_model, metadatas=metadatas)
     
-    # Retorna el indice vectorial para futuras busquedas o almacenamiento
     return vectorstore
 
 def save_vectorstore(vectorstore):
@@ -46,10 +40,8 @@ def save_vectorstore(vectorstore):
     Args:
         vectorstore (FAISS): Indice vectorial a guardar.
     """
-    # Crea la carpeta destino si no existe (evita error al guardar)
     os.makedirs(os.path.dirname(VECTORSTORE_PATH), exist_ok=True)
     
-    # Abre el archivo en modo escritura binaria y guarda el indice con pickle
     with open(VECTORSTORE_PATH, "wb") as f:
         pickle.dump(vectorstore, f)
 
@@ -60,11 +52,9 @@ def load_vectorstore():
     Returns:
         FAISS o None: Indice cargado o None si no existe.
     """
-    # Verifica que el archivo exista para evitar error de carga
     if not os.path.exists(VECTORSTORE_PATH):
         return None
     
-    # Abre el archivo en modo lectura binaria y carga el indice con pickle
     with open(VECTORSTORE_PATH, "rb") as f:
         return pickle.load(f)
 
@@ -81,7 +71,6 @@ def prepare_docs_from_db(data):
     """
     docs = []
 
-    # Obtiene las listas de cada tabla, si no existe devuelve lista vacía
     usuarios = data.get("usuarios", [])
     areas = data.get("areas", [])
     tramites_externos = data.get("tramites_externos", [])
@@ -90,7 +79,6 @@ def prepare_docs_from_db(data):
     derivaciones = data.get("derivaciones", [])
     documentos_generados = data.get("documentos_generados", [])
 
-    # Usuarios
     for u in usuarios:
         texto = (
             f"Usuario ID {u.get('id', '')}: "
@@ -113,7 +101,6 @@ def prepare_docs_from_db(data):
             }
         ))
 
-    # Áreas
     for a in areas:
         texto = (
             f"Área ID {a.get('id', '')}: "
@@ -130,7 +117,6 @@ def prepare_docs_from_db(data):
             }
         ))
 
-    # Trámites externos
     for t in tramites_externos:
         texto = (
             f"Trámite Externo ID {t.get('id', '')}: "
@@ -161,7 +147,6 @@ def prepare_docs_from_db(data):
             }
         ))
 
-    # Trámites internos
     for t in tramites_internos:
         texto = (
             f"Trámite Interno ID {t.get('id', '')}: "
@@ -190,7 +175,6 @@ def prepare_docs_from_db(data):
             }
         ))
 
-    # Seguimiento de trámites
     for s in seguimiento_tramites:
         texto = (
             f"Seguimiento ID {s.get('id', '')}: "
@@ -215,7 +199,6 @@ def prepare_docs_from_db(data):
             }
         ))
 
-    # Derivaciones
     for d in derivaciones:
         texto = (
             f"Derivación ID {d.get('id', '')}: "
@@ -240,7 +223,6 @@ def prepare_docs_from_db(data):
             }
         ))
 
-    # Documentos generados
     for doc in documentos_generados:
         texto = (
             f"Documento generado ID {doc.get('id', '')}: "
@@ -263,5 +245,4 @@ def prepare_docs_from_db(data):
             }
         ))
 
-    # Devuelve la lista completa de documentos listos para embedding
     return docs
