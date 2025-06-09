@@ -356,7 +356,7 @@ export default function TramitesExternos({ usuarioLogueado }) {
                             src={pdfUrl}
                             title="PDF"
                             width="100%"
-                            height="700px"
+                            height="650px"
                             style={{ border: 0, display: "block", borderRadius: "14px 14px 0 0" }}
                         />
                         <button className="btn-modal cerrar" onClick={() => setPdfUrl("")}>Cerrar PDF</button>
@@ -366,44 +366,69 @@ export default function TramitesExternos({ usuarioLogueado }) {
 
             {/* MODAL DETALLE Y ATENDER */}
             {modal && tramiteSel && (
-                <div className="modal-bg">
-                    <div className="modal-tramite-detalle">
-                        <h3>Detalle de Trámite</h3>
-                        <div><b>ID:</b> {tramiteSel.id}</div>
-                        <div><b>Fecha y Hora:</b> {formatearFecha(tramiteSel.fecha_registro)}</div>
-                        <div><b>Remitente:</b> {tramiteSel.remitente}</div>
-                        <div><b>Asunto:</b> {tramiteSel.asunto}</div>
-                        <div><b>Nº Expediente:</b> {tramiteSel.numero_expediente}</div>
-                        <div><b>Código Seguridad:</b> {tramiteSel.codigo_seguridad}</div>
-                        <div><b>Folios:</b> {tramiteSel.folios}</div>
-                        <div><b>Tipo Persona:</b> {tramiteSel.tipo_persona}</div>
-                        <div><b>DNI/RUC:</b> {tramiteSel.dni_ruc}</div>
-                        <div><b>Email:</b> {tramiteSel.email}</div>
-                        <div><b>Teléfono:</b> {tramiteSel.telefono || "-"}</div>
-                        <div><b>Estado:</b>
-                            <select value={estado} onChange={handleEstado} className="spiner-estado">
-                                {ESTADOS.map(est => (
-                                    <option key={est} value={est}>
-                                        {est.charAt(0).toUpperCase() + est.slice(1)}
-                                    </option>
-                                ))}
-                            </select>
-                            <button className="btn-modal atender" onClick={actualizarEstado} disabled={loading}>
-                                <FaCheck /> Guardar Estado
-                            </button>
+                <div className="municipal-modal-bg" onClick={() => setModal(false)}>
+                    <div className="municipal-modal-box" onClick={e => e.stopPropagation()}>
+                        <button className="municipal-modal-close" onClick={() => setModal(false)}>
+                            &times;
+                        </button>
+
+                        <div className="municipal-modal-header">
+                            <div className="municipal-modal-titles">
+                                <h2>
+                                    <span role="img" aria-label="folder">📁</span> Detalle de Trámite
+                                </h2>
+                                <span className="municipal-modal-subtitle">
+                                    Expediente&nbsp;<b>{tramiteSel.numero_expediente}</b>
+                                </span>
+                            </div>
+                            <div className={`municipal-estado-label estado-${estado}`}>
+                                {estado.charAt(0).toUpperCase() + estado.slice(1)}
+                            </div>
                         </div>
-                        <div style={{ marginTop: 12 }}>
-                            <form onSubmit={enviarRespuesta}>
-                                <b>Contestar trámite:</b>
-                                <textarea
-                                    value={respuesta}
-                                    onChange={e => setRespuesta(e.target.value)}
-                                    placeholder="Escribe tu respuesta aquí..."
-                                    rows={3}
-                                    style={{ width: "100%" }}
-                                />
-                                <div className="adjuntar-box">
-                                    <label htmlFor="pdfRespuesta" className="btn-adjuntar">
+
+                        <div className="municipal-modal-content">
+                            <div className="municipal-tramite-grid">
+                                <div><span>ID:</span> {tramiteSel.id}</div>
+                                <div><span>Fecha y Hora:</span> {formatearFecha(tramiteSel.fecha_registro)}</div>
+                                <div><span>Remitente:</span> {tramiteSel.remitente}</div>
+                                <div><span>Asunto:</span> {tramiteSel.asunto}</div>
+                                <div><span>Código Seguridad:</span> {tramiteSel.codigo_seguridad}</div>
+                                <div><span>Folios:</span> {tramiteSel.folios}</div>
+                                <div><span>Tipo Persona:</span> {tramiteSel.tipo_persona}</div>
+                                <div><span>DNI/RUC:</span> {tramiteSel.dni_ruc}</div>
+                                <div><span>Email:</span> {tramiteSel.email}</div>
+                                <div><span>Teléfono:</span> {tramiteSel.telefono || "-"}</div>
+                            </div>
+
+                            <div className="municipal-estado-box">
+                                <label>
+                                    <b>Estado:</b>
+                                    <select value={estado} onChange={handleEstado} className="municipal-select">
+                                        {ESTADOS.map(est => (
+                                            <option key={est} value={est}>
+                                                {est.charAt(0).toUpperCase() + est.slice(1)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+                                <button className="municipal-btn municipal-btn-estado" onClick={actualizarEstado} disabled={loading}>
+                                    <FaCheck /> Guardar Estado
+                                </button>
+                            </div>
+
+                            <form className="municipal-form-horizontal" onSubmit={enviarRespuesta}>
+                                <label>
+                                    <b>Contestar trámite:</b>
+                                    <textarea
+                                        value={respuesta}
+                                        onChange={e => setRespuesta(e.target.value)}
+                                        placeholder="Escribe tu respuesta aquí..."
+                                        rows={4}
+                                        className="municipal-textarea"
+                                    />
+                                </label>
+                                <div className="municipal-form-adjuntar">
+                                    <label htmlFor="pdfRespuesta" className="municipal-btn municipal-btn-adjuntar">
                                         <FaCloudUploadAlt /> Adjuntar PDF respuesta
                                     </label>
                                     <input
@@ -415,72 +440,94 @@ export default function TramitesExternos({ usuarioLogueado }) {
                                         onChange={e => setPdfRespuesta(e.target.files[0])}
                                     />
                                     {pdfRespuesta && (
-                                        <span>
+                                        <span className="municipal-adjunto-file">
                                             <FaFilePdf style={{ color: "#d32f2f" }} />
                                             {pdfRespuesta.name}
                                             <button
                                                 type="button"
-                                                className="btn-cancelar-adjunto"
+                                                className="municipal-btn-cancelar-adjunto"
                                                 onClick={() => { setPdfRespuesta(null); fileInputRef.current.value = ""; }}
                                             >x</button>
                                         </span>
                                     )}
                                 </div>
-                                <button
-                                    className="btn-modal atender"
-                                    type="submit"
-                                    disabled={loading || (!respuesta.trim() && !pdfRespuesta)}
-                                    style={{ marginTop: 10 }}
-                                >
-                                    <FaReply /> Enviar Contestación
-                                </button>
+                                <div className="municipal-form-actions">
+                                    <button
+                                        className="municipal-btn municipal-btn-primary"
+                                        type="submit"
+                                        disabled={loading || (!respuesta.trim() && !pdfRespuesta)}
+                                    >
+                                        <FaReply /> Enviar Contestación
+                                    </button>
+                                    <button
+                                        className="municipal-btn municipal-btn-secondary"
+                                        type="button"
+                                        onClick={() => setModal(false)}
+                                    >
+                                        Cerrar
+                                    </button>
+                                </div>
+                                {success && <span className="municipal-success">{success}</span>}
+                                {error && <span className="municipal-error">{error}</span>}
                             </form>
                         </div>
-                        <div style={{ marginTop: 8 }}>
-                            <button className="btn-modal cerrar" onClick={() => setModal(false)}>
-                                Cerrar
-                            </button>
-                        </div>
-                        {success && <span className="success">{success}</span>}
-                        {error && <span className="error">{error}</span>}
                     </div>
                 </div>
             )}
 
             {/* MODAL DERIVAR */}
             {modalDerivar && tramiteSel && (
-                <div className="modal-bg">
-                    <div className="modal-tramite-detalle">
-                        <h3>Derivar Trámite</h3>
-                        <div><b>ID:</b> {tramiteSel.id}</div>
-                        <div><b>Nº Expediente:</b> {tramiteSel.numero_expediente}</div>
-                        <form onSubmit={derivarTramite} style={{ marginTop: 15 }}>
-                            <label>Área destino:</label>
-                            <select
-                                value={areaDerivar}
-                                onChange={e => setAreaDerivar(e.target.value)}
-                                required
-                                style={{ width: "100%", padding: 7, marginBottom: 11 }}
-                            >
-                                <option value="">Seleccione área</option>
-                                {areas.map(a => (
-                                    <option value={a.id} key={a.id}>{a.nombre}</option>
-                                ))}
-                            </select>
-                            <button
-                                className="btn-modal"
-                                style={{ background: "#ffa726", color: "#1a237e" }}
-                                type="submit"
-                                disabled={loading || !areaDerivar}
-                            >
-                                <FaShareSquare /> Derivar
-                            </button>
-                            <button className="btn-modal cerrar" type="button" onClick={() => setModalDerivar(false)} style={{ marginLeft: 10 }}>
-                                Cancelar
-                            </button>
-                            {successDerivar && <span className="success">{successDerivar}</span>}
-                            {errorDerivar && <span className="error">{errorDerivar}</span>}
-                        </form>
+                <div className="municipal-modal-bg" onClick={() => setModalDerivar(false)}>
+                    <div className="municipal-modal-box" onClick={e => e.stopPropagation()}>
+                        <button className="municipal-modal-close" onClick={() => setModalDerivar(false)}>
+                            &times;
+                        </button>
+                        <div className="municipal-modal-header">
+                            <div className="municipal-modal-titles">
+                                <h2>
+                                    <span role="img" aria-label="arrow">➡️</span> Derivar Trámite
+                                </h2>
+                                <span className="municipal-modal-subtitle">
+                                    Expediente&nbsp;<b>{tramiteSel.numero_expediente}</b>
+                                </span>
+                            </div>
+                        </div>
+                        <div className="municipal-modal-content">
+                            <form className="municipal-form-horizontal" onSubmit={derivarTramite}>
+                                <label>
+                                    <b>Área destino:</b>
+                                    <select
+                                        value={areaDerivar}
+                                        onChange={e => setAreaDerivar(e.target.value)}
+                                        required
+                                        className="municipal-select"
+                                    >
+                                        <option value="">Seleccione área</option>
+                                        {areas.map(a => (
+                                            <option value={a.id} key={a.id}>{a.nombre}</option>
+                                        ))}
+                                    </select>
+                                </label>
+                                <div className="municipal-form-actions">
+                                    <button
+                                        className="municipal-btn municipal-btn-warning"
+                                        type="submit"
+                                        disabled={loading || !areaDerivar}
+                                    >
+                                        <FaShareSquare /> Derivar
+                                    </button>
+                                    <button
+                                        className="municipal-btn municipal-btn-secondary"
+                                        type="button"
+                                        onClick={() => setModalDerivar(false)}
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                                {successDerivar && <span className="municipal-success">{successDerivar}</span>}
+                                {errorDerivar && <span className="municipal-error">{errorDerivar}</span>}
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}

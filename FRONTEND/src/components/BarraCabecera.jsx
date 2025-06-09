@@ -4,7 +4,7 @@ import "../styles/BarraCabecera.css";
 import { FaUserCircle, FaBuilding, FaChevronDown, FaSignOutAlt } from "react-icons/fa";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import ChatbotMunicipal from "./ChatbotMunicipal"; // <-- IMPORTA EL CHATBOT
+import ChatbotMunicipal from "./ChatbotMunicipal"; 
 
 const ROLES_OPTIONS = [
     { value: "admin", label: "Administrador" },
@@ -64,11 +64,10 @@ export default function BarraCabecera() {
     return (
         <header className="cabecera-principal">
             <div className="cabecera-titulo">
-                <FaBuilding style={{ marginRight: "12px", fontSize: "2rem" }} />
+                <FaBuilding style={{ marginRight: "10px", fontSize: "2rem" }} />
                 Municipalidad de Yau
             </div>
 
-            {/* Chatbot Municipal centrado en la cabecera */}
             <div className="cabecera-chatbot-central">
                 <ChatbotMunicipal placement="center" />
             </div>

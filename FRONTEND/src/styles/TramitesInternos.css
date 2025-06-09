@@ -1,247 +1,343 @@
 /*src/styles/TramitesInternos.css */
 
+:root {
+    --modal-bg: rgba(30, 33, 45, 0.82);
+    --modal-box-bg: #fff;
+    --primary: #1565c0;
+    --secondary: #607d8b;
+    --accent: #ffa726;
+    --success: #388e3c;
+    --danger: #d32f2f;
+    --border: #e0e0e0;
+    --shadow: 0 8px 40px rgba(23, 43, 99, 0.22);
+    --radius: 16px;
+    --spacing: 1.5rem;
+    --font: "Segoe UI", "Roboto", Arial, sans-serif;
+}
+
 .tramites-internos-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 18px 12px 50px 12px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px 0 rgba(40,47,70,.07);
-    min-height: 80vh;
-    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    font-family: var(--font);
+    padding: 2.5rem 1.5rem 3rem;
+    background: #f4f7fa;
+    min-height: 100vh;
 }
-.tramites-internos-page h2 {
-    margin-bottom: 18px;
-    color: #23395d;
-}
+
 .toolbar-tramites-in {
-    margin-bottom: 12px;
-    display: flex;
-    gap: 16px;
-}
-.btn-crear {
-    background: #1976d2;
-    color: #fff;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 4px;
-    margin-bottom: 8px;
-    margin-right: 12px;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 16px;
-    transition: background 0.18s;
-}
-.btn-crear:hover {
-    background: #135095;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 18px;
-    font-size: 15px;
-    background: #fdfdfd;
-    box-shadow: 0 0 3px #e2e2e2;
-}
-th, td {
-    padding: 10px 7px;
-    border-bottom: 1px solid #e5e5e5;
-    text-align: left;
-}
-th {
-    background: #f2f7fd;
-    font-weight: bold;
-    color: #124;
-}
-tr:nth-child(even) {
-    background: #fafbfc;
-}
-.btn-accion {
-    background: #eee;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 3px;
-    cursor: pointer;
-    margin-right: 2px;
-    font-size: 15px;
-    transition: background 0.14s;
-}
-.btn-accion:hover {
-    background: #1976d2;
-    color: #fff;
-}
-.btn-eliminar {
-    background: #e53935;
-    color: #fff;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.16s;
-}
-.btn-eliminar:hover {
-    background: #ad2220;
-}
-.form-tramite-interno {
-    margin-bottom: 16px;
-    background: #f4f8fb;
-    padding: 16px 20px 10px 20px;
-    border-radius: 7px;
-    max-width: 530px;
-    box-shadow: 0 1px 3px #dbe7f9;
-}
-.form-tramite-interno div {
-    margin-bottom: 12px;
-}
-.form-tramite-interno label {
-    font-weight: 500;
-    margin-right: 8px;
-    display: inline-block;
-    min-width: 110px;
-    color: #23395d;
-}
-.form-tramite-interno input,
-.form-tramite-interno textarea,
-.form-tramite-interno select {
-    padding: 7px 8px;
-    border-radius: 3px;
-    border: 1px solid #b2b9cc;
-    font-size: 15px;
-    width: 60%;
-    outline: none;
-    margin-top: 4px;
-    background: #fff;
-    transition: border 0.17s;
-}
-.form-tramite-interno input:focus,
-.form-tramite-interno textarea:focus,
-.form-tramite-interno select:focus {
-    border-color: #1976d2;
-}
-.form-tramite-interno textarea {
-    width: 95%;
-    min-height: 60px;
-    resize: vertical;
-}
-.error {
-    color: #d32f2f;
-    background: #fff2f2;
-    padding: 7px 11px;
-    border-radius: 3px;
-    font-size: 15px;
-    margin: 10px 0 0 0;
-    border: 1px solid #ffcdd2;
-}
-.success {
-    color: #388e3c;
-    background: #eafbe7;
-    padding: 7px 11px;
-    border-radius: 3px;
-    font-size: 15px;
-    margin: 10px 0 0 0;
-    border: 1px solid #c8e6c9;
-}
-.loading {
-    color: #1976d2;
-    font-weight: 500;
-    font-size: 17px;
-    padding: 12px 0;
-}
-.modal-bg, .modal-bg-pdf {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(24, 32, 53, 0.28);
-    z-index: 1001;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    overflow-y: auto;
-}
-.modal-tramite-detalle {
-    background: #fff;
-    margin-top: 60px;
-    border-radius: 10px;
-    box-shadow: 0 2px 32px 0 rgba(40,47,70,.18);
-    padding: 22px 35px 22px 35px;
-    max-width: 500px;
-    min-width: 340px;
-    width: 98vw;
-    position: relative;
-    font-size: 15px;
-}
-.modal-tramite-detalle h3 {
-    margin-top: 0;
-    font-size: 21px;
-    color: #23395d;
-}
-.btn-modal {
-    background: #1976d2;
-    color: #fff;
-    border: none;
-    padding: 8px 18px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 8px;
-    margin-right: 10px;
-    font-size: 15px;
-    transition: background 0.13s;
-}
-.btn-modal.atender {
-    background: #27ae60;
-}
-.btn-modal.cerrar {
-    background: #d32f2f;
-}
-.modal-pdf-viewer {
-    background: #fff;
-    border-radius: 16px;
-    max-width: 1100px;
-    width: 92vw;
-    min-height: 70vh;
-    box-shadow: 0 2px 32px 0 rgba(40,47,70,.18);
-    overflow: hidden;
-    margin-top: 30px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-}
-.adjuntar-box {
-    margin-top: 8px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 1.2rem;
+    margin-bottom: 1.7rem;
+    flex-wrap: wrap;
 }
-.btn-adjuntar {
-    background: #eee;
-    padding: 5px 10px;
-    border-radius: 3px;
+
+.btn-crear {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 0.5em 1.2em;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.18s;
+}
+
+.btn-crear:hover {
+    background: #0d47a1;
+}
+
+.loading {
+    color: var(--primary);
+    font-weight: bold;
+    margin: 1.5em 0;
+}
+
+.tabla-tramites-in {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 7px;
+    background: #fff;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 16px #b0bec544;
+}
+
+.tabla-tramites-in th,
+.tabla-tramites-in td {
+    padding: 0.6em 1em;
+    text-align: left;
+}
+
+.tabla-tramites-in th {
+    background: #f5f7fa;
+    color: #294272;
+}
+
+.tabla-tramites-in tbody tr {
+    background: #fff;
+    border-radius: 9px;
+}
+
+.tabla-tramites-in tbody tr td {
+    border-bottom: 1px solid #ecf0f2;
+}
+
+.success {
+    color: var(--success);
+    font-weight: bold;
+    margin-top: 0.6em;
+}
+
+.error {
+    color: var(--danger);
+    font-weight: bold;
+    margin-top: 0.6em;
+}
+
+/* Botones de acción */
+.btn-accion {
+    background: #eceff1;
+    color: var(--primary);
+    border: none;
+    border-radius: 6px;
+    padding: 0.25em 0.7em;
+    font-size: 1.1em;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    color: #333;
-    border: 1px solid #bbb;
-    font-size: 15px;
+    transition: background 0.17s, color 0.17s;
+}
+
+.btn-accion:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+.form-tramite-interno {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.3em 1.7em;
+    background: #fff;
+    padding: 2em 1em;
+    border-radius: 15px;
+    margin-bottom: 1.7em;
+    box-shadow: 0 0 16px #b0bec544;
+}
+
+.form-tramite-interno label {
     font-weight: 500;
-    transition: background 0.14s;
+    margin-bottom: 0.4em;
+    color: var(--primary);
 }
-.btn-adjuntar:hover {
-    background: #eaf3fd;
+
+.form-tramite-interno input,
+.form-tramite-interno textarea,
+.form-tramite-interno select {
+    width: 100%;
+    padding: 0.6em 1em;
+    font-size: 1em;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 0.2em;
+    background: #f6fafd;
 }
-.btn-cancelar-adjunto {
-    background: transparent;
-    color: #d32f2f;
+
+.form-tramite-interno button {
+    grid-column: 1 / -1;
+    margin-top: 0.5em;
+}
+
+.modal-bg,
+.modal-bg-pdf {
+    position: fixed;
+    inset: 0;
+    background: var(--modal-bg);
+    z-index: 1200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeInBg 0.3s;
+}
+
+@keyframes fadeInBg {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-tramite-detalle {
+    background: var(--modal-box-bg);
+    color: #222;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    min-width: 340px;
+    max-width: 630px;
+    width: 94vw;
+    padding: 2.2rem 2.5rem 2rem 2.5rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem;
+    animation: popIn 0.25s;
+}
+
+@keyframes popIn {
+    from {
+        transform: translateY(-30px) scale(0.97);
+        opacity: 0;
+    }
+
+    to {
+        transform: none;
+        opacity: 1;
+    }
+}
+
+.modal-header-int {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.2em;
+    margin-bottom: 0.7em;
+}
+
+.modal-header-int h3 {
+    margin: 0;
+    font-size: 1.3em;
+    color: var(--primary);
+}
+
+.tramite-detalle-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.1em 2.5em;
+    font-size: 1.07em;
+    background: #f7fafd;
+    border-radius: 11px;
+    padding: 1.1em 1em;
+    border: 1px solid var(--border);
+}
+
+.tramite-detalle-row>div {
+    flex: 1 1 42%;
+    min-width: 170px;
+}
+
+.tramite-historial {
+    margin-top: 1em;
+    font-size: 1em;
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 1.1em 1em;
+    border: 1px solid var(--border);
+}
+
+.tramite-historial b {
+    color: var(--primary);
+}
+
+.tramite-historial ol {
+    margin: 0.7em 0 0 1.1em;
+    padding: 0;
+}
+
+.tramite-historial li {
+    margin-bottom: 0.7em;
+    display: flex;
+    align-items: center;
+    gap: 0.55em;
+}
+
+.tramite-historial button.btn-accion {
+    margin-left: 0.7em;
+    font-size: 1.01em;
+}
+
+.btn-modal {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    font-weight: 500;
+    font-size: 1em;
+    border-radius: 8px;
     border: none;
-    font-size: 17px;
     cursor: pointer;
-    margin-left: 7px;
-    font-weight: bold;
+    padding: 0.48em 1.2em;
+    transition: background 0.18s, color 0.18s;
+    margin-top: 0.2em;
+    background: var(--primary);
+    color: #fff;
 }
-ol {
-    padding-left: 23px;
-    margin-bottom: 0;
+
+.btn-modal.cerrar {
+    background: var(--danger);
+    color: #fff;
+    margin-top: 0;
 }
-ol li {
-    margin-bottom: 4px;
+
+.btn-modal.atender {
+    background: var(--success);
+    color: #fff;
+}
+
+.btn-modal:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-modal.cerrar:hover,
+.btn-modal.atender:hover {
+    filter: brightness(1.12);
+}
+
+.btn-cancelar-adjunto {
+    background: none;
+    border: none;
+    color: var(--danger);
+    font-size: 1.05em;
+    margin-left: 0.5em;
+    cursor: pointer;
+}
+
+.btn-adjuntar {
+    background: #e3f2fd;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    padding: 0.3em 0.9em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-size: 0.99em;
+    cursor: pointer;
+    margin-right: 0.8em;
+}
+
+.adjuntar-box {
+    display: flex;
+    align-items: center;
+    gap: 0.9em;
+    margin-top: 0.7em;
+}
+
+@media (max-width: 700px) {
+    .modal-tramite-detalle {
+        padding: 1.1rem 0.6rem;
+    }
+
+    .tramite-detalle-row {
+        flex-direction: column;
+        gap: 0.7em;
+    }
+
+    .form-tramite-interno {
+        grid-template-columns: 1fr;
+    }
 }

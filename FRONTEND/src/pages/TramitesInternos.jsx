@@ -1,7 +1,9 @@
 // src/pages/TramitesInternos.jsx
 
 import { useEffect, useState, useRef } from "react";
-import { FaSync, FaEye, FaCheck, FaReply, FaShareSquare, FaFilePdf, FaCloudUploadAlt, FaPlusCircle } from "react-icons/fa";
+import {
+    FaSync, FaEye, FaCheck, FaReply, FaShareSquare, FaFilePdf, FaCloudUploadAlt, FaPlusCircle
+} from "react-icons/fa";
 import "../styles/TramitesInternos.css";
 
 function formatearFecha(fechaIso) {
@@ -19,6 +21,18 @@ function formatearFecha(fechaIso) {
     } catch {
         return fechaIso;
     }
+}
+
+function reemplazarAreaEnDescripcion(descripcion, areas) {
+    const match = descripcion.match(/ID (\d+)/);
+    if (match) {
+        const areaId = parseInt(match[1]);
+        const area = areas.find(a => a.id === areaId);
+        if (area) {
+            return descripcion.replace(`ID ${areaId}`, area.nombre);
+        }
+    }
+    return descripcion;
 }
 
 export default function TramitesInternos({ usuarioLogueado }) {
@@ -50,8 +64,8 @@ export default function TramitesInternos({ usuarioLogueado }) {
     const [areaDerivar, setAreaDerivar] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
-    const [estadoFiltro, setEstadoFiltro] = useState(""); 
-    const [busqueda, setBusqueda] = useState(""); 
+    const [estadoFiltro, setEstadoFiltro] = useState("");
+    const [busqueda, setBusqueda] = useState("");
     const fileInputRef = useRef(null);
     const fileInputFormRef = useRef(null);
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
@@ -125,7 +139,7 @@ export default function TramitesInternos({ usuarioLogueado }) {
             const res = await fetch(url, { method: "POST", body: formData });
             const data = await res.json();
             if (!res.ok) throw new Error(data.detail || "Error al crear trámite interno");
-            setSuccess("Trámite creado correctamente.");
+            setSuccess("Trámite interno creado correctamente.");
             setTimeout(() => setSuccess(""), 1800);
             setFormVisible(false);
             setForm({
@@ -186,7 +200,7 @@ export default function TramitesInternos({ usuarioLogueado }) {
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.detail || "Error al derivar trámite");
-            setSuccessMsg("Trámite derivado exitosamente.");
+            setSuccessMsg("Trámite interno derivado con éxito.");
             setTimeout(() => setSuccessMsg(""), 1500);
             setTimeout(() => setModalDerivar(false), 900);
             setAreaDerivar("");
@@ -263,18 +277,17 @@ export default function TramitesInternos({ usuarioLogueado }) {
         setModalPDF({ mostrar: true, url });
     };
 
+    // Mostrar nombre y no el id
     const nombreArea = (area_id) => {
         const area = areas.find(a => a.id === area_id);
-        return area ? area.nombre : area_id;
+        return area ? area.nombre : "";
     };
 
     const puedeRecibir = (t) =>
         t.estado === "derivado" && usuarioLogueado.area_id === t.area_destino_id;
 
     const tramitesFiltrados = tramites
-        .filter(t =>
-            !estadoFiltro || t.estado === estadoFiltro
-        )
+        .filter(t => !estadoFiltro || t.estado === estadoFiltro)
         .filter(t => {
             if (!busqueda.trim()) return true;
             const b = busqueda.trim().toLowerCase();
@@ -328,7 +341,7 @@ export default function TramitesInternos({ usuarioLogueado }) {
                         <input name="asunto" value={form.asunto} onChange={handleFormChange} required />
                     </div>
                     <div>
-                        <label>Contenido:</label>
+                        <label>Contenido / Descripción:</label>
                         <textarea name="contenido" value={form.contenido} onChange={handleFormChange} required />
                     </div>
                     <div>
@@ -351,17 +364,16 @@ export default function TramitesInternos({ usuarioLogueado }) {
                         <input name="prioridad" type="number" min={1} max={5} value={form.prioridad} onChange={handleFormChange} />
                     </div>
                     <button type="submit" className="btn-crear">Crear</button>
+                    {success && <div className="success">{success}</div>}
+                    {error && <div className="error">{error}</div>}
                 </form>
-            )}
-            {(success || error) && (
-                <div className={success ? "success" : "error"}>{success || error}</div>
             )}
             {loading ? (
                 <div className="loading">Cargando trámites internos...</div>
             ) : error ? (
                 <div className="error">{error}</div>
             ) : (
-                <table>
+                <table className="tabla-tramites-in">
                     <thead>
                         <tr>
                             <th>N°</th>
@@ -442,24 +454,43 @@ export default function TramitesInternos({ usuarioLogueado }) {
 
             {/* MODAL DETALLE + HISTORIAL */}
             {modal && tramiteSel && (
-                <div className="modal-bg">
-                    <div className="modal-tramite-detalle">
-                        <h3>Detalle de Trámite Interno</h3>
-                        <div><b>N°:</b> {tramites.findIndex(x => x.id === tramiteSel.id) + 1}</div>
-                        <div><b>Referencia:</b> {tramiteSel.numero_referencia}</div>
-                        <div><b>Asunto:</b> {tramiteSel.asunto}</div>
-                        <div><b>Área Origen:</b> {nombreArea(tramiteSel.area_origen_id)}</div>
-                        <div><b>Área Destino:</b> {nombreArea(tramiteSel.area_destino_id)}</div>
-                        <div><b>Estado:</b> {tramiteSel.estado}</div>
-                        <div><b>Fecha Envío:</b> {formatearFecha(tramiteSel.fecha_envio)}</div>
-                        <div style={{ marginTop: 18 }}>
+                <div className="modal-bg" onClick={() => setModal(false)}>
+                    <div className="modal-tramite-detalle" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header-int">
+                            <h3>Detalle de Trámite Interno</h3>
+                            <button className="btn-modal cerrar" onClick={() => setModal(false)}>×</button>
+                        </div>
+                        <div className="tramite-detalle-row">
+                            <div>
+                                <b>N°:</b> {tramites.findIndex(x => x.id === tramiteSel.id) + 1}
+                            </div>
+                            <div>
+                                <b>Referencia:</b> {tramiteSel.numero_referencia}
+                            </div>
+                            <div>
+                                <b>Asunto:</b> {tramiteSel.asunto}
+                            </div>
+                            <div>
+                                <b>Área Origen:</b> {nombreArea(tramiteSel.area_origen_id)}
+                            </div>
+                            <div>
+                                <b>Área Destino:</b> {nombreArea(tramiteSel.area_destino_id)}
+                            </div>
+                            <div>
+                                <b>Estado:</b> {tramiteSel.estado}
+                            </div>
+                            <div>
+                                <b>Fecha Envío:</b> {formatearFecha(tramiteSel.fecha_envio)}
+                            </div>
+                        </div>
+                        <div className="tramite-historial">
                             <b>Historial / Seguimiento:</b>
                             <ol>
                                 {seguimiento.length === 0 ? (
                                     <li>No hay movimientos registrados.</li>
                                 ) : seguimiento.map((mov) => (
                                     <li key={mov.id}>
-                                        <b>{mov.accion}:</b> {mov.descripcion} <i>({formatearFecha(mov.fecha_hora)})</i>
+                                        <b>{mov.accion}:</b> {reemplazarAreaEnDescripcion(mov.descripcion, areas)} <i>({formatearFecha(mov.fecha_hora)})</i>
                                         {mov.adjunto && (
                                             <button className="btn-accion" onClick={() => verPDF(mov.adjunto)} title="Ver PDF Adjunto">
                                                 <FaFilePdf />
@@ -469,20 +500,18 @@ export default function TramitesInternos({ usuarioLogueado }) {
                                 ))}
                             </ol>
                         </div>
-                        <div style={{ marginTop: 8 }}>
-                            <button className="btn-modal cerrar" onClick={() => setModal(false)}>
-                                Cerrar
-                            </button>
-                        </div>
                     </div>
                 </div>
             )}
 
             {/* MODAL DERIVAR */}
             {modalDerivar && tramiteSel && (
-                <div className="modal-bg">
-                    <div className="modal-tramite-detalle">
-                        <h3>Derivar Trámite Interno</h3>
+                <div className="modal-bg" onClick={() => setModalDerivar(false)}>
+                    <div className="modal-tramite-detalle" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header-int">
+                            <h3>Derivar Trámite Interno</h3>
+                            <button className="btn-modal cerrar" onClick={() => setModalDerivar(false)}>×</button>
+                        </div>
                         <form onSubmit={derivarTramite} style={{ marginTop: 15 }}>
                             <label>Área destino:</label>
                             <select
@@ -514,9 +543,12 @@ export default function TramitesInternos({ usuarioLogueado }) {
 
             {/* MODAL CONTESTAR */}
             {modalContestar && tramiteSel && (
-                <div className="modal-bg">
-                    <div className="modal-tramite-detalle">
-                        <h3>Contestar Trámite Interno</h3>
+                <div className="modal-bg" onClick={() => setModalContestar(false)}>
+                    <div className="modal-tramite-detalle" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header-int">
+                            <h3>Contestar Trámite Interno</h3>
+                            <button className="btn-modal cerrar" onClick={() => setModalContestar(false)}>×</button>
+                        </div>
                         <form onSubmit={contestarTramite}>
                             <textarea
                                 value={respuesta}
@@ -554,14 +586,9 @@ export default function TramitesInternos({ usuarioLogueado }) {
                                 style={{ marginTop: 10 }}>
                                 <FaReply /> Enviar Contestación
                             </button>
+                            {successMsg && <span className="success">{successMsg}</span>}
+                            {errorMsg && <span className="error">{errorMsg}</span>}
                         </form>
-                        <div style={{ marginTop: 8 }}>
-                            <button className="btn-modal cerrar" onClick={() => setModalContestar(false)}>
-                                Cerrar
-                            </button>
-                        </div>
-                        {successMsg && <span className="success">{successMsg}</span>}
-                        {errorMsg && <span className="error">{errorMsg}</span>}
                     </div>
                 </div>
             )}

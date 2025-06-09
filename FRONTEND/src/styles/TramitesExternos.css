@@ -103,104 +103,528 @@
     margin: 10px 0;
 }
 
-.modal-bg,
 .modal-bg-pdf {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(30, 40, 60, 0.22);
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-pdf-viewer {
+    width: 90vw;
+    max-width: 1100px;
+    min-height: 70vh;
+    max-height: 90vh;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.modal-pdf-viewer:hover {
+    transform: scale(1);
+}
+
+.modal-pdf-viewer::before {
+    content: '';
+    display: block;
+    height: 12px;
+    background: linear-gradient(to right, #3498db, #2ecc71);
+}
+
+.modal-pdf-viewer iframe {
+    flex-grow: 1;
+    border: none;
+    min-height: 500px;
+    background: #f5f5f5;
+}
+
+/* Botón de cerrar */
+.btn-modal.cerrar {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 8px 16px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
     display: flex;
     align-items: center;
-    justify-content: center;
-    z-index: 1000;
+    gap: 6px;
+    z-index: 10;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.modal-tramite-detalle,
-.modal-pdf-viewer {
-    background: #fff;
-    padding: 34px 28px;
-    border-radius: 12px;
-    min-width: 320px;
-    max-width: 440px;
-    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.15);
-    font-size: 16px;
-    color: #1a237e;
-    position: relative;
+.btn-modal.cerrar:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.modal-pdf-viewer {
-    max-width: 780px;
-    width: 95vw;
-    min-width: 360px;
-    padding: 12px 12px 32px 12px;
+.modal-pdf-controls {
+    padding: 12px 20px;
+    background: #2c3e50;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.modal-tramite-detalle h3,
-.modal-pdf-viewer h3 {
-    margin-top: 0;
-    color: #2d7ff9;
+.modal-pdf-controls .page-info {
+    font-size: 14px;
 }
 
-.btn-modal {
-    margin: 8px 6px 0 0;
-    padding: 8px 17px;
+.modal-pdf-controls .zoom-controls button {
+    background: rgba(255, 255, 255, 0.1);
     border: none;
+    color: white;
+    padding: 5px 10px;
+    margin: 0 5px;
     border-radius: 4px;
     cursor: pointer;
-    color: white;
-    font-size: 15px;
-    transition: background 0.1s;
+    transition: background 0.2s;
 }
 
-.btn-modal.atender {
-    background: #388e3c;
+.modal-pdf-controls .zoom-controls button:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
-.btn-modal.cerrar {
-    background: #bdbdbd;
+/* Animación de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        transform: translateY(0) scale(0.95);
+    }
+}
+
+.modal-bg-pdf {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-pdf-viewer {
+    animation: slideUp 0.3s ease-out;
+}
+
+/* Efecto de carga */
+.pdf-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pdf-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(52, 152, 219, 0.2);
+    border-radius: 50%;
+    border-top-color: #3498db;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.pdf-loading-text {
+    margin-top: 15px;
+    color: #3498db;
+    font-weight: 500;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .modal-pdf-viewer {
+        width: 95vw;
+        height: 80vh;
+    }
+
+    .modal-pdf-viewer iframe {
+        min-height: 300px;
+    }
+
+    .btn-modal.cerrar {
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+}
+
+:root {
+    --modal-bg: rgba(30, 33, 45, 0.82);
+    --modal-box-bg: #fff;
+    --primary: #1565c0;
+    --secondary: #607d8b;
+    --accent: #fbc02d;
+    --success: #388e3c;
+    --danger: #d32f2f;
+    --border: #e0e0e0;
+    --shadow: 0 8px 40px rgba(23, 43, 99, 0.22);
+    --radius: 16px;
+    --spacing: 1.5rem;
+    --font: "Segoe UI", "Roboto", Arial, sans-serif;
+}
+
+.municipal-modal-bg {
+    position: fixed;
+    inset: 0;
+    background: var(--modal-bg);
+    z-index: 1200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeInBg 0.3s;
+}
+
+@keyframes fadeInBg {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.municipal-modal-box {
+    background: var(--modal-box-bg);
+    color: #222;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    max-width: 720px;
+    width: 95%;
+    padding: var(--spacing);
+    position: relative;
+    animation: popIn 0.25s;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@keyframes popIn {
+    from {
+        transform: translateY(-30px) scale(0.96);
+        opacity: 0;
+    }
+
+    to {
+        transform: none;
+        opacity: 1;
+    }
+}
+
+.municipal-modal-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    font-size: 2rem;
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    z-index: 2;
+    transition: color 0.2s;
+}
+
+.municipal-modal-close:hover {
+    color: #fff;
+    background: var(--danger);
+    border-radius: 50%;
+}
+
+.municipal-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.75rem;
+}
+
+.municipal-modal-titles h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.municipal-modal-subtitle {
+    color: var(--secondary);
+    font-size: 1rem;
+}
+
+.municipal-estado-label {
+    padding: 0.3em 1em;
+    border-radius: 2em;
+    font-weight: bold;
+    font-size: 1rem;
+    text-transform: capitalize;
+    background: #f5f5f5;
+    border: 1px solid var(--border);
+}
+
+.estado-pendiente {
+    background: #fff3cd;
+    color: #b18a00;
+    border-color: #ffe082;
+}
+
+.estado-enproceso {
+    background: #bbdefb;
+    color: var(--primary);
+    border-color: #90caf9;
+}
+
+.estado-finalizado {
+    background: #c8e6c9;
+    color: var(--success);
+    border-color: #a5d6a7;
+}
+
+.estado-rechazado {
+    background: #ffcdd2;
+    color: var(--danger);
+    border-color: #ef9a9a;
+}
+
+
+.municipal-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.municipal-tramite-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem 2.5rem;
+    font-size: 1rem;
+    border-radius: 12px;
+    background: #f7fafd;
+    padding: 1.3rem 1rem;
+    margin-bottom: 1.2rem;
+    border: 1px solid var(--border);
+}
+
+.municipal-tramite-grid>div {
+    flex: 1 1 42%;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    min-width: 220px;
+}
+
+.municipal-tramite-grid span {
+    color: var(--secondary);
+    font-weight: 500;
+    min-width: 100px;
+    display: inline-block;
+}
+
+.municipal-estado-box {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 0.7rem;
+}
+
+.municipal-select {
+    padding: 0.4em 1em;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #fafafa;
+    font-size: 1rem;
+    margin-left: 0.7em;
+    transition: border 0.2s;
+}
+
+.municipal-select:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.municipal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-weight: 500;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    padding: 0.5em 1.2em;
+    transition: background 0.18s, color 0.18s;
+    margin-top: 0.2em;
+}
+
+.municipal-btn-primary {
+    background: var(--primary);
+    color: #fff;
+}
+
+.municipal-btn-secondary {
+    background: var(--secondary);
+    color: #fff;
+}
+
+.municipal-btn-warning {
+    background: var(--accent);
     color: #222;
 }
 
-.btn-adjuntar {
-    background: #ffa726;
-    color: #1a237e;
-    padding: 6px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    display: inline-block;
-    margin-right: 10px;
+.municipal-btn-estado {
+    background: var(--success);
+    color: #fff;
 }
 
-.adjuntar-box {
-    margin-top: 8px;
-    margin-bottom: 6px;
+.municipal-btn-adjuntar {
+    background: #e3f2fd;
+    color: var(--primary);
+    border: 1px solid var(--primary);
 }
 
-.btn-cancelar-adjunto {
-    background: #ffe3e3;
-    color: #d32f2f;
+.municipal-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.municipal-btn-cancelar-adjunto {
+    background: none;
     border: none;
-    font-size: 14px;
-    margin-left: 6px;
-    padding: 0px 6px;
-    border-radius: 3px;
+    color: var(--danger);
+    font-size: 1.1em;
+    margin-left: 0.6em;
     cursor: pointer;
 }
 
-textarea {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #bdbdbd;
-    font-size: 16px;
-    margin-top: 6px;
-    min-height: 60px;
+.municipal-form-horizontal {
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem;
 }
 
-.spiner-estado {
-    margin: 0 12px;
-    font-size: 15px;
-    padding: 3px 8px;
+.municipal-form-horizontal label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+    color: var(--primary);
+    font-size: 1.02rem;
+    gap: 0.5em;
+}
+
+.municipal-textarea {
+    resize: vertical;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 1rem;
+    padding: 0.7em 1em;
+    min-height: 72px;
+    margin-top: 0.3em;
+    transition: border 0.2s;
+}
+
+.municipal-textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.municipal-form-adjuntar {
+    display: flex;
+    align-items: center;
+    gap: 1.2em;
+}
+
+.municipal-adjunto-file {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    background: #fce4ec;
+    color: #ad1457;
+    border-radius: 6px;
+    font-size: 0.98em;
+    padding: 0.35em 0.8em 0.35em 0.6em;
+    border: 1px solid #f8bbd0;
+}
+
+.municipal-form-actions {
+    display: flex;
+    gap: 1.1em;
+    flex-wrap: wrap;
+    margin-top: 0.5em;
+}
+
+.municipal-success {
+    color: var(--success);
+    font-weight: 600;
+    margin-top: 0.4em;
+}
+
+.municipal-error {
+    color: var(--danger);
+    font-weight: 600;
+    margin-top: 0.4em;
+}
+
+@media (max-width: 700px) {
+    .municipal-modal-box {
+        max-width: 99vw;
+        padding: 1rem;
+    }
+
+    .municipal-modal-header {
+        flex-direction: column;
+        gap: 1em;
+    }
+
+    .municipal-tramite-grid {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .municipal-form-actions {
+        flex-direction: column;
+        gap: 0.7em;
+    }
+}
+
+.municipal-btn:hover:not(:disabled) {
+    filter: brightness(1.15);
+    box-shadow: 0 2px 10px #1565c025;
 }

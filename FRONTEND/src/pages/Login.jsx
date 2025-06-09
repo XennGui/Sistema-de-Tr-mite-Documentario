@@ -1,6 +1,6 @@
 // src/pages/Login.jsx
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BarraSuperior from "../components/BarraSuperior";
 import { loginUsuario } from "../services/usuarioService";
@@ -15,12 +15,6 @@ export default function Login() {
     const [cargando, setCargando] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (localStorage.getItem("usuario")) {
-            navigate("/dashboard", { replace: true });
-        }
-    }, [navigate]);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -34,6 +28,7 @@ export default function Login() {
             setError(respuesta.mensaje || "Usuario o contraseña incorrectos.");
         }
     };
+
 
     return (
         <div className="login-bg">
