@@ -24,6 +24,7 @@ from email.mime.multipart import MIMEMultipart
 
 router = APIRouter(prefix="/tramites-externos", tags=["Trámites Externos"])
 
+
 MESA_PARTES_CORREO = "xen.luna.07@gmail.com"
 MESA_PARTES_CLAVE = "hvqicgclgwzsbyoo"
 
