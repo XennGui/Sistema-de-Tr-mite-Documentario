@@ -1,0 +1,43 @@
+PASOS PARA CONECTARSE AL PROYECTO
+
+/----- Backend (Python - FastAPI) ------/
+
+📁 Dentro del directorio del backend
+
+
+1.- Crear archivo .env en la raíz del backend y colocar esto:
+
+DB_HOST=localhost
+DB_NAME=municipio
+DB_USER=postgres
+DB_PASS=admin
+DB_PORT=5436
+
+
+2.- Crear el entorno virtual:
+python -m venv env
+
+3.- Activar el entorno virtual:
+.\env\Scripts\activate
+
+4.- Instalar las dependencias del proyecto:
+pip install -r requirements.txt
+
+5.- Iniciar el servidor backend:
+uvicorn app:app --reload
+
+
+
+/----- Frontend (React/Vite) ------/
+
+📁 Dentro del directorio del frontend:
+
+1.- Crear archivo .env en la raíz del frontend y colocar esto:
+
+VITE_API_URL=http://localhost:8000
+
+2.- Instalar las dependencias:
+npm install
+
+3.- Iniciar el servidor con React/Vite:
+npm run dev
