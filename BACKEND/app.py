@@ -92,11 +92,10 @@ def construir_contexto_pdf(metadatos, texto_pdf):
     contexto += "\nContenido extraído del PDF:\n" + texto_pdf[:6000]
     return contexto
 
-
 app = FastAPI()
 
-app.mount("/archivos_tramites", StaticFiles(directory="archivos_tramites"), name="archivos_tramites")
-app.mount("/respuestas_tramites", StaticFiles(directory="respuestas_tramites"), name="respuestas_tramites")
+os.makedirs("archivos_tramites", exist_ok=True)
+os.makedirs("respuestas_tramites", exist_ok=True)
 
 #configuración CORS para React-Vite
 app.add_middleware(
